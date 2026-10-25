@@ -1,0 +1,22 @@
+-- Migration 128 — Sprint 7: Combate 顿悟 (Insight), a 4ª VIA de input do Corpo
+-- Prompts/sprint7_combate_dunwu.md. ADDITIVE + WIPE-SAFE.
+--
+-- A 4ª e mais ACTIVA fonte do Cultivo do Corpo: vencer uma LUTA DIGNA (oponente com
+-- BP ≥ fracção do meu) tempera a carne — sobe `mortal_temper_progress` (a MESMA moeda
+-- das Hortas/Caça/Ambiental), com cooldown como pacer. E sobreviver a uma luta À-BEIRA-
+-- DA-MORTE (HP final baixo) dá a carga de 顿悟 (`insight_charge_expires_at`, já criada na
+-- Migration 127) que a Cerimónia-Semente (Sprint 8, BT-4) consome para Forçar sem risco.
+-- Hook POST-settle, ADITIVO e gated em `_notify_duel_result` (combate inalterado: dano/
+-- qi/BP/vencedor idênticos). NUNCA toca qi/qi_capacity (BC-5).
+--
+-- Esta migration só adiciona UM timestamp nullable:
+--   • last_combat_insight_at — cooldown do faucet de progresso (a carga de 顿悟 reusa a
+--     coluna insight_charge_expires_at da Migration 127).
+--
+-- ⚠️ REGRA DE FERRO DOS 57 (Lei §1): DEFAULT NULL → os 57 do `main` ficam em NULL = NEUTRO.
+-- O hook só escreve com `cultivo_corpo_r0` ON E realm < 7; no `main` (flag OFF) é no-op,
+-- o resultado do duelo é byte-idêntico, e nada lê esta coluna.
+--
+-- IMPORTANTE: o runner faz split em ";". Todo comentário é FULL-LINE (ver migration 108).
+
+ALTER TABLE players ADD COLUMN IF NOT EXISTS last_combat_insight_at TIMESTAMPTZ DEFAULT NULL;

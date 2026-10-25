@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.venv/
+venv/
+
+# Repo housekeeping
+.git/
+.gitignore
+.github/
+
+# Docs / planning (not needed in image — bloats it)
+*.md
+Cerebro/
+
+# Local IDE
+.vscode/
+.idea/
+.claude/
+
+# Local data / secrets
+.env
+.env.*
+.nivrael/
+*.log
+
+# Website build artifacts (re-built fresh in stage 1)
+website/node_modules/
+website/dist/
+# O bundle do mini-app tambem nasce na stage 1 — um `dist` local e' sempre
+# mais velho do que as fontes que vao na imagem.
+miniapp/dist/
+
+# Other
+*.docx
+scratch/

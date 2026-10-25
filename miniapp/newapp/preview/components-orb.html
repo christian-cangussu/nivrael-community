@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Noto+Sans:wght@400;500&family=Noto+Serif+SC:wght@700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#06080f;font-family:'Noto Sans',sans-serif;padding:16px;display:flex;gap:24px;align-items:center;justify-content:center;flex-wrap:wrap;color:#e2eaff}
+
+@keyframes orb-breathe{0%,100%{transform:scale(1);filter:brightness(1)}50%{transform:scale(1.045);filter:brightness(1.18)}}
+@keyframes orb-ring-out{0%{transform:scale(.85);opacity:.6}100%{transform:scale(1.55);opacity:0}}
+@keyframes qi-rise{0%{transform:translateY(0) translateX(0) scale(1);opacity:.85}100%{transform:translateY(-80px) translateX(var(--dx,18px)) scale(0);opacity:0}}
+@keyframes drift{0%,100%{opacity:.5}50%{opacity:1}}
+
+.orb-wrap{position:relative;width:140px;height:140px;display:grid;place-items:center;flex-shrink:0}
+.orb{position:absolute;inset:18px;border-radius:50%;animation:orb-breathe 4s ease-in-out infinite}
+.orb-ring{position:absolute;inset:0;border-radius:50%;border:1px solid rgba(180,200,255,.25);animation:orb-ring-out 3s ease-out infinite}
+.orb-ring:nth-child(2){animation-delay:1s}
+.orb-ring:nth-child(3){animation-delay:2s}
+.orb-glyph{position:relative;z-index:2;font-family:'Noto Serif SC',serif;font-size:38px;font-weight:700;color:rgba(255,255,255,.92);text-shadow:0 0 14px rgba(220,230,255,.7);pointer-events:none}
+.qi-particles{position:absolute;inset:0;pointer-events:none}
+.qi-particles span{position:absolute;bottom:50%;left:50%;width:4px;height:4px;border-radius:50%;background:rgba(170,210,255,.85);box-shadow:0 0 6px rgba(170,210,255,.9);animation:qi-rise 3s ease-out infinite}
+
+.orb-idle{background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.55),transparent 45%),radial-gradient(circle at 70% 70%,rgba(60,140,255,.55),transparent 60%),radial-gradient(circle at 50% 50%,#6b9eff,#1f3c8a 70%,#0e1b3a);box-shadow:0 0 40px rgba(85,140,255,.45),inset 0 0 20px rgba(180,210,255,.35)}
+.orb-meditate{background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.6),transparent 45%),radial-gradient(circle at 70% 70%,rgba(168,85,247,.55),transparent 60%),radial-gradient(circle at 50% 50%,#b478ff,#5f2da3 70%,#2a0e5e);box-shadow:0 0 60px rgba(168,85,247,.55),inset 0 0 22px rgba(220,200,255,.4);animation-duration:2.6s}
+.orb-r10{background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.65),transparent 40%),radial-gradient(circle at 70% 70%,rgba(244,114,182,.6),transparent 55%),radial-gradient(circle at 50% 50%,#f9a8d4,#c9903a 65%,#7c2d12);box-shadow:0 0 60px rgba(244,114,182,.5),0 0 80px rgba(201,144,58,.3),inset 0 0 22px rgba(255,240,200,.4)}
+
+.caption{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.8px;text-transform:uppercase;color:#3d5a9e;text-align:center;margin-top:8px}
+</style></head>
+<body>
+  <!-- Idle -->
+  <div style="display:flex;flex-direction:column;align-items:center">
+    <div class="orb-wrap">
+      <div class="orb orb-idle"></div>
+      <div class="orb-glyph">道</div>
+    </div>
+    <div class="caption">Idle</div>
+  </div>
+
+  <!-- Meditating -->
+  <div style="display:flex;flex-direction:column;align-items:center">
+    <div class="orb-wrap">
+      <div class="orb-ring"></div>
+      <div class="orb-ring"></div>
+      <div class="orb-ring"></div>
+      <div class="orb orb-meditate"></div>
+      <div class="qi-particles">
+        <span style="left:40%;--dx:-20px;animation-delay:-.5s"></span>
+        <span style="left:50%;--dx:15px;animation-delay:-1.2s"></span>
+        <span style="left:60%;--dx:25px;animation-delay:-2s"></span>
+        <span style="left:35%;--dx:-30px;animation-delay:-2.7s"></span>
+      </div>
+      <div class="orb-glyph">氣</div>
+    </div>
+    <div class="caption">Meditating</div>
+  </div>
+
+  <!-- True Immortal -->
+  <div style="display:flex;flex-direction:column;align-items:center">
+    <div class="orb-wrap">
+      <div class="orb-ring" style="border-color:rgba(244,114,182,.3)"></div>
+      <div class="orb-ring" style="border-color:rgba(244,114,182,.2);animation-delay:1.5s"></div>
+      <div class="orb orb-r10"></div>
+      <div class="orb-glyph" style="color:rgba(255,230,200,.95);text-shadow:0 0 18px rgba(244,114,182,.8)">仙</div>
+    </div>
+    <div class="caption">True Immortal</div>
+  </div>
+</body></html>

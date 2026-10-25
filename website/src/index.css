@@ -1,0 +1,610 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&family=Noto+Serif+SC:wght@400;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Focus indicators for keyboard navigation */
+*:focus-visible {
+  outline: 2px solid #FFD700;
+  outline-offset: 2px;
+}
+
+/* Remove default outline only when not using keyboard */
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
+@layer base {
+  :root {
+    --background: 240 67% 5%;
+    --foreground: 45 100% 90%;
+    --card: 240 50% 8%;
+    --card-foreground: 45 100% 90%;
+    --popover: 240 50% 8%;
+    --popover-foreground: 45 100% 90%;
+    --primary: 51 100% 50%;
+    --primary-foreground: 240 67% 5%;
+    --secondary: 270 76% 40%;
+    --secondary-foreground: 45 100% 95%;
+    --muted: 240 30% 15%;
+    --muted-foreground: 220 20% 60%;
+    --accent: 187 94% 43%;
+    --accent-foreground: 240 67% 5%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 240 30% 18%;
+    --input: 240 30% 18%;
+    --ring: 51 100% 50%;
+    --radius: 0.75rem;
+
+    --gold: 51 100% 50%;
+    --gold-dim: 45 80% 40%;
+    --celestial: 270 76% 40%;
+    --celestial-glow: 270 80% 55%;
+    --qi-cyan: 187 94% 43%;
+    --void-dark: 240 67% 5%;
+    --void-deeper: 240 70% 3%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', sans-serif;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: 'Cinzel', serif;
+  }
+}
+
+@layer utilities {
+  .text-gold-gradient {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, hsl(var(--gold)), hsl(var(--gold-dim)), hsl(var(--gold)));
+  }
+
+  .glow-gold {
+    text-shadow: 0 0 20px hsl(var(--gold) / 0.5), 0 0 40px hsl(var(--gold) / 0.3);
+  }
+
+  .glow-celestial {
+    box-shadow: 0 0 20px hsl(var(--celestial) / 0.4), 0 0 40px hsl(var(--celestial) / 0.2);
+  }
+
+  .glow-badge {
+    animation: badge-glow 2s ease-in-out infinite;
+  }
+
+  .fade-in-up {
+    animation: fade-in-up 0.8s ease-out forwards;
+    opacity: 0;
+  }
+
+  .float-particle {
+    animation: float-y 6s ease-in-out infinite;
+  }
+
+  .glass-panel {
+    @apply bg-card/40 backdrop-blur-md border border-border/40;
+  }
+
+  /* 3D Flip Card Utilities */
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+
+  .transform-style-3d {
+    transform-style: preserve-3d;
+  }
+
+  .backface-hidden {
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+
+  .rotate-y-180 {
+    transform: rotateY(180deg);
+  }
+
+  .group-hover-rotate-y-180:hover {
+    transform: rotateY(180deg);
+  }
+
+  .realm-card-aura {
+    transition: box-shadow 0.5s ease, border-color 0.5s ease, transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .typing-cursor::after {
+    content: '|';
+    animation: blink-cursor 0.8s step-end infinite;
+    color: hsl(var(--qi-cyan));
+    margin-left: 2px;
+  }
+
+  .shimmer-border {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .shimmer-border::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, hsl(var(--gold) / 0.3), hsl(var(--celestial) / 0.3), hsl(var(--gold) / 0.3));
+    background-size: 200% 200%;
+    animation: shimmer 3s linear infinite;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  .stagger-in {
+    opacity: 0;
+    transform: translateY(40px) rotateX(10deg);
+    transition: opacity 0.8s ease-out, transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .stagger-in.visible {
+    opacity: 1;
+    transform: translateY(0) rotateX(0deg);
+  }
+
+  .text-reveal {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+  }
+
+  .text-reveal>span {
+    display: inline-block;
+    transform: translateY(100%);
+    opacity: 0;
+    transition: transform 1s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 1s ease-out;
+  }
+
+  .text-reveal.visible>span {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .animate-shimmer-fast {
+    animation: shimmer-fast 1.5s infinite linear;
+  }
+}
+
+@keyframes badge-glow {
+
+  0%,
+  100% {
+    box-shadow: 0 0 10px hsl(var(--gold) / 0.4), 0 0 20px hsl(var(--gold) / 0.2);
+  }
+
+  50% {
+    box-shadow: 0 0 20px hsl(var(--gold) / 0.6), 0 0 40px hsl(var(--gold) / 0.4), 0 0 60px hsl(var(--gold) / 0.2);
+  }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float-y {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes blink-cursor {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes shimmer-fast {
+  0% {
+    transform: translateX(-150%) skewX(12deg);
+  }
+
+  100% {
+    transform: translateX(250%) skewX(12deg);
+  }
+}
+
+@keyframes hero-title-glow {
+
+  0%,
+  100% {
+    text-shadow: 0 0 20px hsl(var(--gold) / 0.5), 0 0 40px hsl(var(--gold) / 0.3);
+  }
+
+  50% {
+    text-shadow: 0 0 30px hsl(var(--gold) / 0.8), 0 0 60px hsl(var(--gold) / 0.5), 0 0 90px hsl(var(--gold) / 0.3);
+  }
+}
+
+.hero-title-pulsate {
+  animation: hero-title-glow 3s ease-in-out infinite;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--void-deeper));
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--celestial) / 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--celestial) / 0.5);
+}
+
+/* ── Animations ─────────────────────────────────────────────────────────────── */
+
+/* Spin slow (loading screen, yin-yang) */
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 8s linear infinite;
+}
+
+/* Float Y (ambient orbs) */
+@keyframes float-orbit {
+
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+
+  33% {
+    transform: translateY(-14px) rotate(3deg);
+  }
+
+  66% {
+    transform: translateY(-6px) rotate(-2deg);
+  }
+}
+
+.animate-float-y {
+  animation: float-orbit 5s ease-in-out infinite;
+}
+
+/* True Immortal card — gentle bob */
+@keyframes true-immortal-bob {
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.true-immortal-bob {
+  animation: true-immortal-bob 3.5s ease-in-out infinite;
+}
+
+/* Crown pulse */
+@keyframes crown-pulse {
+
+  0%,
+  100% {
+    filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.7));
+    transform: scale(1);
+  }
+
+  50% {
+    filter: drop-shadow(0 0 28px rgba(255, 215, 0, 1)) drop-shadow(0 0 50px rgba(255, 140, 0, 0.6));
+    transform: scale(1.07);
+  }
+}
+
+.crown-pulse {
+  animation: crown-pulse 2.2s ease-in-out infinite;
+}
+
+/* True Immortal particle ring */
+@keyframes ti-particle-orbit {
+  0% {
+    transform: rotate(0deg) translateX(55px) scale(1);
+    opacity: 0.8;
+  }
+
+  50% {
+    transform: rotate(180deg) translateX(55px) scale(0.6);
+    opacity: 0.4;
+  }
+
+  100% {
+    transform: rotate(360deg) translateX(55px) scale(1);
+    opacity: 0.8;
+  }
+}
+
+.true-immortal-particles::before,
+.true-immortal-particles::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  border-radius: 50%;
+  background: #FFD700;
+  box-shadow: 0 0 8px rgba(255, 215, 0, 0.9);
+  animation: ti-particle-orbit 4s linear infinite;
+}
+
+.true-immortal-particles::after {
+  animation-delay: -2s;
+  background: #FF8C00;
+  box-shadow: 0 0 8px rgba(255, 140, 0, 0.9);
+}
+
+/* Lightning flicker (Heavenly Tribulations icon) */
+@keyframes lightning-flicker {
+
+  0%,
+  89%,
+  91%,
+  93%,
+  100% {
+    opacity: 1;
+  }
+
+  90%,
+  92% {
+    opacity: 0.15;
+  }
+}
+
+.lightning-flicker {
+  animation: lightning-flicker 3.5s ease-in-out infinite;
+}
+
+/* Shimmer bar (True Immortal progress) */
+@keyframes shimmer-bar {
+  0% {
+    background-position: -200% center;
+  }
+
+  100% {
+    background-position: 200% center;
+  }
+}
+
+/* Void-deep background alias */
+.bg-void-deep {
+  background-color: hsl(var(--void-deeper));
+}
+
+/* text-gold-gradient utility */
+.text-gold-gradient {
+  background: linear-gradient(135deg, hsl(var(--gold)), hsl(var(--gold-dim)), hsl(var(--gold)));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* 3D utilities (ensure present) */
+.transform-style-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+/* ── Hero Scene CSS Animations ──────────────────────────────────────────────── */
+
+/* Mist drift layers */
+.hero-mist-1 {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent, rgba(255, 255, 255, 0.03), transparent);
+  animation: mist-drift 25s linear infinite;
+  filter: blur(20px);
+}
+
+.hero-mist-2 {
+  background: linear-gradient(90deg, transparent, rgba(200, 200, 255, 0.04), transparent, rgba(200, 200, 255, 0.02), transparent);
+  animation: mist-drift 35s linear infinite reverse;
+  filter: blur(30px);
+}
+
+@keyframes mist-drift {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Dao circle — slow spin */
+.hero-dao-spin {
+  animation: dao-spin 30s linear infinite;
+}
+
+/* Dao character — glow pulse */
+.hero-dao-glow {
+  animation: dao-glow-pulse 4s ease-in-out infinite;
+}
+
+@keyframes dao-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes dao-glow-pulse {
+
+  0%,
+  100% {
+    opacity: 0.3;
+    text-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+  }
+
+  50% {
+    opacity: 0.6;
+    text-shadow: 0 0 40px rgba(255, 215, 0, 0.6), 0 0 80px rgba(255, 215, 0, 0.2);
+  }
+}
+
+/* CSS Particles — float upward */
+.hero-particle {
+  position: absolute;
+  bottom: -10px;
+  width: 3px;
+  height: 3px;
+  background: radial-gradient(circle, rgba(255, 215, 0, 0.8), transparent);
+  border-radius: 50%;
+  animation: float-particle linear infinite;
+  pointer-events: none;
+}
+
+@keyframes float-particle {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 0.8;
+  }
+
+  90% {
+    opacity: 0.2;
+  }
+
+  100% {
+    transform: translateY(-100vh) translateX(30px);
+    opacity: 0;
+  }
+}
+
+/* Star twinkle — tiny dots that fade in/out */
+.hero-star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: #fff;
+  border-radius: 50%;
+  animation: star-twinkle ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes star-twinkle {
+
+  0%,
+  100% {
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Footer CSS particles — reuse float-particle keyframes */
+.footer-particle {
+  position: absolute;
+  bottom: -10px;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  animation: float-particle linear infinite;
+  pointer-events: none;
+}
+
+/* Prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .hero-mist-1,
+  .hero-mist-2,
+  .hero-dao-spin,
+  .hero-dao-glow,
+  .hero-particle,
+  .hero-star,
+  .footer-particle {
+    animation: none !important;
+  }
+
+  .hero-dao-glow {
+    opacity: 0.4;
+    text-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+  }
+}

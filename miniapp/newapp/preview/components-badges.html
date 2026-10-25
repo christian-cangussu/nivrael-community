@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Noto+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#06080f;font-family:'Noto Sans',sans-serif;padding:20px 24px;color:#e2eaff;display:flex;flex-direction:column;gap:8px}
+.badge{display:inline-block;padding:2px 7px;border-radius:999px;font-size:10px;font-weight:600}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:8px 0;border-bottom:1px solid rgba(60,90,180,.12)}
+.row:last-child{border-bottom:none}
+.rlabel{font-size:9px;color:#3d5a9e;text-transform:uppercase;letter-spacing:.5px;width:80px;flex-shrink:0}
+/* Realm pill */
+.realm-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:600;background:rgba(0,0,0,.35);border:1px solid;white-space:nowrap}
+/* Seg control */
+.seg{display:flex;gap:4px;background:rgba(0,0,0,.3);border:1px solid #1e3060;border-radius:10px;padding:3px}
+.seg button{flex:1;background:none;border:none;color:#3d5a9e;font-size:11px;font-weight:600;padding:7px 10px;border-radius:7px;cursor:pointer;letter-spacing:.5px;font-family:'Cinzel',serif}
+.seg button.on{background:linear-gradient(180deg,rgba(201,144,58,.3),rgba(120,80,30,.4));color:#f5c97a}
+</style></head>
+<body>
+  <div class="row">
+    <div class="rlabel">Jade</div>
+    <span class="badge" style="background:rgba(62,207,126,.18);color:#3ecf7e;border:1px solid rgba(62,207,126,.35)">Ancião</span>
+    <span class="badge" style="background:rgba(62,207,126,.18);color:#3ecf7e;border:1px solid rgba(62,207,126,.35)">✓ Completo</span>
+    <span class="badge" style="background:rgba(62,207,126,.18);color:#3ecf7e;border:1px solid rgba(62,207,126,.35)">×2.5 qi/s</span>
+  </div>
+  <div class="row">
+    <div class="rlabel">Gold</div>
+    <span class="badge" style="background:rgba(201,144,58,.18);color:#f5c97a;border:1px solid rgba(201,144,58,.35)">Mestre</span>
+    <span class="badge" style="background:rgba(201,144,58,.18);color:#f5c97a;border:1px solid rgba(201,144,58,.35)">P3 Prestígio</span>
+  </div>
+  <div class="row">
+    <div class="rlabel">Warn</div>
+    <span class="badge" style="background:rgba(245,158,11,.16);color:#f59e0b;border:1px solid rgba(245,158,11,.35)">Pronta</span>
+    <span class="badge" style="background:rgba(245,158,11,.16);color:#f59e0b;border:1px solid rgba(245,158,11,.35)">⚠ Atenção</span>
+  </div>
+  <div class="row">
+    <div class="rlabel">Red</div>
+    <span class="badge" style="background:rgba(229,83,75,.16);color:#e5534b;border:1px solid rgba(229,83,75,.35)">Perigo</span>
+    <span class="badge" style="background:rgba(229,83,75,.16);color:#e5534b;border:1px solid rgba(229,83,75,.35)">Mortal</span>
+  </div>
+  <div class="row">
+    <div class="rlabel">Realm Pills</div>
+    <span class="realm-pill" style="border-color:#60a5fa;color:#60a5fa">氣 7</span>
+    <span class="realm-pill" style="border-color:#a855f7;color:#a855f7">核 3</span>
+    <span class="realm-pill" style="border-color:#2dd4bf;color:#2dd4bf">嬰 5</span>
+    <span class="realm-pill" style="border-color:#f472b6;color:#f472b6">仙 9</span>
+  </div>
+  <div class="row">
+    <div class="rlabel">Seg Control</div>
+    <div class="seg">
+      <button class="on">Cultivo</button>
+      <button>Poder</button>
+      <button>Seitas</button>
+    </div>
+  </div>
+</body></html>

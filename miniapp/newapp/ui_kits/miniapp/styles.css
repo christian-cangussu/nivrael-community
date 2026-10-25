@@ -1,0 +1,61 @@
+/* Nivrael Miniapp UI Kit — Shared Styles */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Noto+Sans:wght@300;400;500;600&family=Noto+Serif+SC:wght@500;700&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body, #root { height: 100%; width: 100%; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  font-family: 'Noto Sans', system-ui, sans-serif;
+  background: #06080f;
+  color: #e2eaff;
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
+  overflow: hidden;
+}
+
+:root {
+  --realm-0: #9ca3af; --realm-1: #60a5fa; --realm-2: #fbbf24;
+  --realm-3: #a855f7; --realm-4: #2dd4bf; --realm-5: #3b82f6;
+  --realm-6: #8b5cf6; --realm-7: #f59e0b; --realm-8: #38bdf8;
+  --realm-9: #eab308; --realm-10: #f472b6;
+  --bg: #06080f; --card: #0d1422; --panel: #111d35;
+  --border: #1e3060; --border2: #253f7a;
+  --text: #e2eaff; --muted: #6e89bf; --muted2: #3d5a9e;
+  --gold: #c9903a; --gold2: #f5c97a;
+  --jade: #3ecf7e; --red: #e5534b; --warn: #f59e0b;
+}
+
+@keyframes orb-breathe {
+  0%,100% { transform: scale(1); filter: brightness(1); }
+  50% { transform: scale(1.045); filter: brightness(1.18); }
+}
+@keyframes orb-ring-out {
+  0% { transform: scale(.85); opacity: .6; }
+  100% { transform: scale(1.55); opacity: 0; }
+}
+@keyframes qi-rise {
+  0% { transform: translateY(0) translateX(0) scale(1); opacity: .85; }
+  100% { transform: translateY(-110px) translateX(var(--dx,18px)) scale(0); opacity: 0; }
+}
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes drift-bg {
+  0% { transform: translate(0,0); opacity: .04; }
+  50% { opacity: .08; }
+  100% { transform: translate(20px,-30px); opacity: .04; }
+}
+@keyframes constellation-twinkle {
+  0%,100% { opacity: .3; }
+  50% { opacity: .9; }
+}
+@keyframes cloud-drift {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-30px); }
+}

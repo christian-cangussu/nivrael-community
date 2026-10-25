@@ -1,0 +1,35 @@
+# Fim de linha — LF em todo o lado, no repositório E na cópia de trabalho.
+#
+# Porquê: o repositório JÁ está todo em LF (medido a 2026-08-20: índice e árvore
+# de trabalho, ambos LF), mas `core.autocrlf=true` no Windows anunciava a cada
+# ficheiro tocado que "LF will be replaced by CRLF the next time Git touches it".
+# Não era um problema de conteúdo — era o Git a prometer converter a cópia de
+# trabalho no próximo checkout, o que produziria ruído e, pior, quebraria coisas
+# que TÊM de ser LF no destino: este projeto corre em Docker Linux, e um
+# Dockerfile, um `.sh` ou uma migration com CRLF falham lá.
+#
+# Com este ficheiro a intenção passa a ser do REPOSITÓRIO e não da configuração
+# local de cada máquina — quem clonar em Windows deixa de ver o aviso e deixa de
+# poder introduzir CRLF por acidente. Zero alteração de conteúdo ao adicionar.
+* text=auto eol=lf
+
+# Binários — nunca tocar (uma "normalização" aqui corrompe o ficheiro).
+*.png     binary
+*.webp    binary
+*.jpg     binary
+*.jpeg    binary
+*.ico     binary
+*.gif     binary
+*.pdf     binary
+*.docx    binary
+*.woff    binary
+*.woff2   binary
+*.ttf     binary
+*.otf     binary
+*.lockb   binary
+*.db      binary
+*.sqlite  binary
+*.sqlite3 binary
+
+# SVG é texto (XML), mas não deve ser tratado como diff-able de código.
+*.svg     text eol=lf

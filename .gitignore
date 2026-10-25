@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+.pytest_cache/
+
+# Environment — only the example is public
+.env
+.env.*
+!.env.example
+
+# Local state (the generated session secret lives here)
+.nivrael/
+
+# Node / builds (the Dockerfile and scripts/build_miniapp.mjs make them)
+node_modules/
+dist/
+
+# Databases and dumps never belong here
+*.db
+*.sqlite
+*.sqlite3
+*.dump
+
+# Logs, editors, OS
+*.log
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Git Bash on Windows turns `2>nul` into a file called `nul`
+nul

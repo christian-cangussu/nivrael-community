@@ -1,0 +1,21 @@
+-- Migration 120 — Track A item 5: Raízes (composição elemental)
+-- Grand Design §9 Track A, item 5. ADDITIVE + WIPE-SAFE.
+--
+-- Adds the ORTHOGONAL "composition" axis to the spirit root. Today `spirit_root`
+-- holds only the QUALITY/purity tier (0=Heavenly..4=Low). This column holds the
+-- COMPOSITION: which Wuxing elements {metal/wood/water/fire/earth} + optional rare
+-- variant {lightning/ice/wind/dark/chaos/space/time} the cultivator's root carries.
+-- It is a JSONB array of language-neutral element keys, e.g. ["fire","earth"].
+--
+-- DISCLOSURE-ONLY this wave: nothing in combat/cultivation/alchemy reads it. The
+-- real elemental gating + Wuxing cycle + modifiers are Track B (wipe-bound).
+--
+-- Backwards-compatible: DEFAULT NULL so all 57+ beta players land neutral. The
+-- value is derived deterministically per telegram_id (core.root_engine) at
+-- character birth and via an idempotent startup backfill — never altering the
+-- existing `spirit_root` quality column.
+--
+-- IMPORTANT: comments here are FULL-LINE only. An inline "--" comment containing
+-- a stray ";" would split a statement mid-flight (see migration 108 prod crash).
+
+ALTER TABLE players ADD COLUMN IF NOT EXISTS root_elements JSONB DEFAULT NULL;

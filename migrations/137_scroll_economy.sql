@@ -1,0 +1,28 @@
+-- TEC-2 Técnicas & Escassez — Drop Reset + Economia do Pergaminho (Migration 137).
+--
+-- Aditiva (Lei §5 — launch-server-ready; os 57 do main ficam byte-idênticos
+-- porque a flag per-world `escassez_scrolls` fica OFF e NENHUM caminho de
+-- código escreve aqui sem ela):
+--
+--   * players.scroll_econ — o LIVRO DO DIA da doação de pergaminhos.
+--     Shape: {"d": "YYYY-MM-DD", "cp": <contribuição creditada hoje>}.
+--     NULL = nunca doou (o estado de TODOS hoje). Existe por uma razão só:
+--     o teto diário de contribuição por doação (knob SCR_DONATE_DAILY_CAP)
+--     — a trava que impede que ligar a flag num mundo com pergaminhos
+--     acumulados (o recon de 2026-07-27 achou 3.8M no main e 17.8k no s2)
+--     vire uma impressora de mérito. Sem ledger não há teto honesto: a
+--     contribuição de seita NPC (Player.sect_contribution) não tem tabela
+--     de log — `sect_contribution_log` é da GUILDA (sects UUID), outra moeda.
+--
+-- Por que JSONB e não 2 colunas: um único campo mantém dia+valor atômicos
+-- (nunca um dia novo com o valor velho) e deixa espaço para telemetria futura
+-- do sink sem nova migration. Escrito SEMPRE por substituição do dict inteiro
+-- (o valor é auto-contido — não há merge a preservar, ao contrário do
+-- region_states.payload do MV-3/MV-7).
+--
+-- O engine é core/scroll_economy_engine.py. Nunca DROP, nunca UPDATE em massa.
+--
+-- IMPORTANTE: o runner faz split em ";". Todo comentário é FULL-LINE — um "--"
+-- inline com um ";" perdido truncaria a statement (ver o crash da migration 108).
+
+ALTER TABLE players ADD COLUMN IF NOT EXISTS scroll_econ JSONB DEFAULT NULL;

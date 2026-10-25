@@ -1,0 +1,1396 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Nivrael</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Noto+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+  <style>
+    /* ── Reset & Base ─────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body, #root { height: 100%; width: 100%; overflow: hidden; }
+
+    body {
+      font-family: 'Noto Sans', system-ui, sans-serif;
+      background: #06080f;
+      color: #e2eaff;
+      -webkit-font-smoothing: antialiased;
+      overscroll-behavior: none;
+    }
+
+    /* ── Realm colour tokens ──────────────────────────── */
+    :root {
+      --realm-0: #9ca3af;  /* Mortal */
+      --realm-1: #60a5fa;  /* Qi Condensation */
+      --realm-2: #fbbf24;  /* Foundation */
+      --realm-3: #a855f7;  /* Core Formation */
+      --realm-4: #2dd4bf;  /* Nascent Soul */
+      --realm-5: #3b82f6;  /* Spirit Transformation */
+      --realm-6: #8b5cf6;  /* Void Refinement */
+      --realm-7: #f59e0b;  /* Body Integration */
+      --realm-8: #38bdf8;  /* Mahayana */
+      --realm-9: #eab308;  /* Half-Immortal */
+      --realm-10:#f472b6;  /* True Immortal */
+
+      --bg:       #06080f;
+      --card:     #0d1422;
+      --panel:    #111d35;
+      --border:   #1e3060;
+      --border2:  #253f7a;
+      --text:     #e2eaff;
+      --muted:    #6e89bf;
+      --muted2:   #3d5a9e;
+      --gold:     #c9903a;
+      --jade:     #3ecf7e;
+      --red:      #e5534b;
+      --warn:     #f59e0b;
+    }
+
+    /* ── Keyframes ────────────────────────────────────── */
+    @keyframes orb-pulse {
+      0%,100% { transform: scale(1);    opacity: .85; }
+      50%      { transform: scale(1.06); opacity: 1;   }
+    }
+    @keyframes orb-ring {
+      0%   { transform: scale(.9); opacity: .5; }
+      100% { transform: scale(1.7); opacity: 0; }
+    }
+    @keyframes particle-float {
+      0%   { transform: translateY(0)   translateX(0)   scale(1);   opacity: .7; }
+      100% { transform: translateY(-90px) translateX(var(--dx,15px)) scale(0); opacity: 0; }
+    }
+    @keyframes bar-fill {
+      from { width: 0; }
+    }
+    @keyframes fade-in {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes shimmer {
+      0%   { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    @keyframes spin-slow {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+    @keyframes tick-glow {
+      0%,100% { box-shadow: 0 0 8px 2px currentColor; }
+      50%      { box-shadow: 0 0 20px 6px currentColor; }
+    }
+
+    /* ── Scrollable content area ──────────────────────── */
+    .screen-scroll {
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      height: 100%;
+      padding-bottom: 76px;
+    }
+    .screen-scroll::-webkit-scrollbar { display: none; }
+
+    /* ── Cards / Panels ───────────────────────────────── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+    }
+    .card-sm {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+    }
+
+    /* ── Progress bar ─────────────────────────────────── */
+    .progress-track {
+      width: 100%;
+      height: 8px;
+      background: rgba(255,255,255,.07);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      border-radius: 999px;
+      animation: bar-fill .8s ease both;
+    }
+
+    /* ── Buttons ──────────────────────────────────────── */
+    .btn {
+      border: none;
+      border-radius: 10px;
+      padding: 10px 16px;
+      font-family: 'Noto Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity .15s, transform .1s;
+      letter-spacing: .3px;
+    }
+    .btn:active { transform: scale(.96); opacity: .85; }
+    .btn-primary {
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(124,58,237,.35);
+    }
+    .btn-gold {
+      background: linear-gradient(135deg, #92600a, #c9903a);
+      color: #fff5dc;
+      box-shadow: 0 4px 16px rgba(201,144,58,.25);
+    }
+    .btn-ghost {
+      background: rgba(255,255,255,.06);
+      border: 1px solid var(--border2);
+      color: var(--muted);
+    }
+    .btn-danger {
+      background: linear-gradient(135deg, #7f1d1d, #e5534b);
+      color: #fff;
+    }
+    .btn-jade {
+      background: linear-gradient(135deg, #065f46, #3ecf7e);
+      color: #e0fff0;
+    }
+
+    /* ── Badge / chip ─────────────────────────────────── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      border: 1px solid;
+    }
+
+    /* ── Section header ───────────────────────────────── */
+    .section-title {
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    /* ── Bottom Nav ───────────────────────────────────── */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 64px;
+      background: rgba(9,12,24,.95);
+      border-top: 1px solid var(--border);
+      backdrop-filter: blur(20px);
+      display: flex;
+      z-index: 100;
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    .nav-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 6px 0 4px;
+      transition: opacity .15s;
+    }
+    .nav-icon { font-size: 20px; line-height: 1; }
+    .nav-label { font-size: 9px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; }
+    .nav-item.active .nav-label { color: var(--text); }
+    .nav-item:not(.active) .nav-label { color: var(--muted2); }
+    .nav-item:not(.active) .nav-icon { filter: grayscale(.6) opacity(.5); }
+
+    /* ── Floating top header ──────────────────────────── */
+    .top-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(6,8,15,.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* ── Qi Orb ───────────────────────────────────────── */
+    .orb-wrap {
+      position: relative;
+      width: 140px;
+      height: 140px;
+      margin: 0 auto;
+    }
+    .orb {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      animation: orb-pulse 3s ease-in-out infinite;
+    }
+    .orb-ring {
+      position: absolute;
+      inset: -10px;
+      border-radius: 50%;
+      border: 1px solid;
+      animation: orb-ring 2.5s ease-out infinite;
+    }
+    .orb-particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      bottom: 50%;
+      left: 50%;
+      animation: particle-float 2.5s ease-out infinite;
+    }
+
+    /* ── List items ───────────────────────────────────── */
+    .list-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 13px;
+    }
+
+    /* ── Stat grid ────────────────────────────────────── */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .stat-box {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+    }
+    .stat-label { font-size: 10px; color: var(--muted); font-weight: 500; letter-spacing: .5px; text-transform: uppercase; }
+    .stat-value { font-size: 18px; font-weight: 600; margin-top: 2px; }
+
+    /* ── Screen fade ──────────────────────────────────── */
+    .screen-fade { animation: fade-in .25s ease both; }
+
+    /* ── Meditation timer ─────────────────────────────── */
+    .med-timer {
+      font-family: 'Cinzel', serif;
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-align: center;
+    }
+
+    /* ── World feed entry ─────────────────────────────── */
+    .feed-entry {
+      display: flex;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+    .feed-entry:last-child { border-bottom: none; }
+    .feed-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-top: 4px;
+      flex-shrink: 0;
+    }
+
+    /* ── Dungeon card ─────────────────────────────────── */
+    .dungeon-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .diff-badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
+      letter-spacing: .5px;
+      text-transform: uppercase;
+    }
+
+    /* ── Achievement ──────────────────────────────────── */
+    .achievement {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+    .achievement-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    /* ── Shimmer loading ──────────────────────────────── */
+    .shimmer {
+      background: linear-gradient(90deg, var(--panel) 25%, var(--border) 50%, var(--panel) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
+
+// ─────────────────────────────────────────────────────────
+// CONFIG — change API_BASE to your bot domain when ready
+// ─────────────────────────────────────────────────────────
+// Frontend pode estar em domínio separado do bot.
+// Prioridade:
+// 1) ?api_base=https://api.exemplo.com
+// 2) window.__NIVRAEL_API_BASE__ (injetado no host)
+// 3) fallback produção
+const API_BASE =
+  new URLSearchParams(window.location.search).get("api_base") ||
+  window.__NIVRAEL_API_BASE__ ||
+  "http://nk8gcgg8oos00cw40okko44g.193.187.129.105.sslip.io";
+
+const REALM_NAMES = [
+  "Mortal","Qi Condensation","Foundation Establishment",
+  "Core Formation","Nascent Soul","Spirit Transformation",
+  "Void Refinement","Body Integration","Mahayana",
+  "Half-Immortal","True Immortal"
+];
+const REALM_EMOJI = ["🪨","☯️","🏯","🔮","👻","⚡","🐉","🌟","💎","👑","🌸"];
+const REALM_COLORS = [
+  "#9ca3af","#60a5fa","#fbbf24","#a855f7","#2dd4bf",
+  "#3b82f6","#8b5cf6","#f59e0b","#38bdf8","#eab308","#f472b6"
+];
+
+const SUB_LABELS = ["","I","II","III","IV","V","VI","VII","VIII","IX"];
+
+// ─────────────────────────────────────────────────────────
+// MOCK PLAYER — substituído por dados reais da API
+// ─────────────────────────────────────────────────────────
+const MOCK_PLAYER = {
+  dao_name: "Ardens Voidwalker",
+  realm: 6, sub_layer: 3,
+  spirit_root: "High", spirit_root_emoji: "⚡",
+  cb: 2480000, cb_threshold: 2800000,
+  qi: 620, qi_max: 1000,
+  hp: 840, hp_max: 1000,
+  spirit_stones: 45230, spirit_jade: 150,
+  prestige: 0, prestige_title: null,
+  meditation_type: "deep",
+  meditation_started: Date.now() - 1800000,
+  meditation_active: true,
+  sect_name: "Moon Veil Pavilion", sect_rank: "Elder",
+  faction: "Celestial", faction_emoji: "☀️",
+  bp: 128400, atk: 16820, def: 9410,
+  evasion: 24, crit: 18,
+  body_tempering: 8, body_tempering_max: 9,
+  dao_fragments: 340,
+  tribulation_ready: true,
+  heart_demon_risk: "Low",
+  daily_quests: [
+    { name: "Meditar 30 min", done: true, progress: null },
+    { name: "Completar 2 masmorras", done: false, progress: "1/2" },
+    { name: "Criar 3 pills", done: false, progress: "2/3" },
+    { name: "Doar à sect vault", done: false, progress: null },
+  ],
+  world_feed: [
+    { msg: "World Boss 'Azure Tyrant' apareceu!", time: "18:00", type: "boss" },
+    { msg: "Sect Eclipse conquistou Celestial Peak", time: "17:42", type: "sect" },
+    { msg: "Yun_Ming atingiu Mahayana IX", time: "16:13", type: "player" },
+    { msg: "Fundação Perfeita: StarVoid quebrou registo!", time: "15:01", type: "milestone" },
+  ],
+  dungeons: [
+    { name: "Fallen Lotus Temple", difficulty: "Normal", success: 94, realm_req: 4 },
+    { name: "Ancient Spirit Cavern", difficulty: "Hard", success: 74, realm_req: 5 },
+    { name: "Ashen Dragon Ruins", difficulty: "Nightmare", success: 41, realm_req: 6 },
+    { name: "Void Rift Depths", difficulty: "Insane", success: 12, realm_req: 7 },
+    { name: "Chaos Realm Fracture", difficulty: "Celestial", success: 3, realm_req: 9 },
+  ],
+  techniques: [
+    { name: "Void Slash", mastery: 4, mastery_max: 5, type: "Attack" },
+    { name: "Thunder Step", mastery: 3, mastery_max: 5, type: "Evasion" },
+    { name: "Soul Lock Palm", mastery: 2, mastery_max: 5, type: "Control" },
+    { name: "Mountain Guard", mastery: 5, mastery_max: 5, type: "Defense" },
+  ],
+  rankings: [
+    { pos: 1, name: "Celestial_Dao", realm: 8, bp: 980000 },
+    { pos: 2, name: "Yun_Ming", realm: 8, bp: 920000 },
+    { pos: 3, name: "Ardens Voidwalker", realm: 6, bp: 128400, is_self: true },
+    { pos: 4, name: "StarVoid", realm: 6, bp: 115000 },
+    { pos: 5, name: "Iron_Will", realm: 5, bp: 89000 },
+  ],
+  achievements: [
+    { name: "Primeiro Breakthrough", icon: "⚡", done: true, desc: "Atingiu Qi Condensation" },
+    { name: "Alquimista", icon: "⚗️", done: true, desc: "Criou 50 pills" },
+    { name: "Sobrevivente", icon: "💀", done: true, desc: "Sobreviveu à primeira tribulação" },
+    { name: "Elder da Sect", icon: "🏛️", done: true, desc: "Tornou-se Elder" },
+    { name: "Caçador de Bosses", icon: "🐲", done: false, desc: "Derrotou 10 world bosses" },
+    { name: "Imortal", icon: "🌸", done: false, desc: "Atingiu True Immortal" },
+  ],
+  cauldron: "Azure Lotus Furnace",
+  soul_fire_tier: 5,
+  weapon: "Starfall Blade +7",
+  armor: "Void Silk Robe +5",
+};
+
+// ─────────────────────────────────────────────────────────
+// HELPERS
+// ─────────────────────────────────────────────────────────
+function fmt(n) {
+  if (n >= 1e9) return (n/1e9).toFixed(2) + "B";
+  if (n >= 1e6) return (n/1e6).toFixed(2) + "M";
+  if (n >= 1e3) return (n/1e3).toFixed(1) + "K";
+  return String(n);
+}
+
+function pct(a, b) { return Math.min(100, Math.round(a / b * 100)); }
+
+function useTimer(startedAt, active) {
+  const [elapsed, setElapsed] = useState(0);
+  useEffect(() => {
+    if (!active || !startedAt) return;
+    const update = () => setElapsed(Date.now() - startedAt);
+    update();
+    const id = setInterval(update, 1000);
+    return () => clearInterval(id);
+  }, [startedAt, active]);
+  const s = Math.floor(elapsed / 1000);
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const sec = s % 60;
+  return `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(sec).padStart(2,"0")}`;
+}
+
+// ─────────────────────────────────────────────────────────
+// QI ORB
+// ─────────────────────────────────────────────────────────
+function QiOrb({ realm, active }) {
+  const col = REALM_COLORS[realm] || "#8b5cf6";
+  const particles = [
+    { dx: "20px", delay: "0s",   ml: "10px", mb: "10px" },
+    { dx: "-15px",delay: ".6s",  ml: "-10px",mb: "5px"  },
+    { dx: "5px",  delay: "1.2s", ml: "15px", mb: "0px"  },
+    { dx: "-20px",delay: "1.8s", ml: "-5px", mb: "-5px" },
+    { dx: "15px", delay: ".3s",  ml: "-15px",mb: "8px"  },
+  ];
+  return (
+    <div className="orb-wrap">
+      <div className="orb" style={{
+        background: `radial-gradient(circle at 38% 35%, ${col}cc, ${col}44 55%, ${col}11)`,
+        boxShadow: `0 0 40px 10px ${col}44, inset 0 0 30px ${col}22`,
+      }} />
+      <div className="orb-ring" style={{ borderColor: col + "66" }} />
+      <div className="orb-ring" style={{ borderColor: col + "33", animationDelay: ".8s" }} />
+      {active && particles.map((p, i) => (
+        <div key={i} className="orb-particle" style={{
+          background: col,
+          "--dx": p.dx,
+          animationDelay: p.delay,
+          animationDuration: `${2 + i * 0.3}s`,
+          marginLeft: p.ml,
+          marginBottom: p.mb,
+          boxShadow: `0 0 6px 2px ${col}88`,
+        }} />
+      ))}
+      <div style={{
+        position: "absolute", inset: 0,
+        display: "flex", flexDirection: "column",
+        alignItems: "center", justifyContent: "center",
+        gap: 2,
+      }}>
+        <span style={{ fontSize: 28, lineHeight: 1 }}>{REALM_EMOJI[realm]}</span>
+        {active && (
+          <span style={{
+            fontSize: 9, fontWeight: 700, letterSpacing: 1,
+            color: col, textTransform: "uppercase",
+            background: "rgba(0,0,0,.5)", borderRadius: 4,
+            padding: "1px 6px", marginTop: 4,
+          }}>cultivando</span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────
+// SCREEN: HOME / CULTIVAR
+// ─────────────────────────────────────────────────────────
+function HomeScreen({ player }) {
+  const col = REALM_COLORS[player.realm];
+  const cbPct = pct(player.cb, player.cb_threshold);
+  const qiPct = pct(player.qi, player.qi_max);
+  const hpPct = pct(player.hp, player.hp_max);
+  const timer = useTimer(player.meditation_started, player.meditation_active);
+  const medTypes = { light: "🧘 Leve", deep: "🔮 Profunda", void: "💜 Vazio", celestial_dao: "🌠 Celestial" };
+
+  return (
+    <div className="screen-scroll screen-fade">
+      {/* Header */}
+      <div style={{ padding: "16px 16px 0" }}>
+        {/* Resource bar */}
+        <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
+          <div style={{
+            flex: 1, background: "rgba(201,144,58,.12)", border: "1px solid rgba(201,144,58,.25)",
+            borderRadius: 10, padding: "6px 10px", display: "flex", alignItems: "center", gap: 6,
+          }}>
+            <span style={{ fontSize: 14 }}>💎</span>
+            <span style={{ fontSize: 12, color: "#c9903a", fontWeight: 700 }}>{fmt(player.spirit_stones)}</span>
+            <span style={{ fontSize: 10, color: "var(--muted)", marginLeft: 2 }}>Stones</span>
+          </div>
+          <div style={{
+            flex: 1, background: "rgba(124,58,237,.12)", border: "1px solid rgba(124,58,237,.25)",
+            borderRadius: 10, padding: "6px 10px", display: "flex", alignItems: "center", gap: 6,
+          }}>
+            <span style={{ fontSize: 14 }}>🔮</span>
+            <span style={{ fontSize: 12, color: "#a78bfa", fontWeight: 700 }}>{player.spirit_jade}</span>
+            <span style={{ fontSize: 10, color: "var(--muted)", marginLeft: 2 }}>Jade</span>
+          </div>
+          {player.tribulation_ready && (
+            <div style={{
+              background: "rgba(229,83,75,.15)", border: "1px solid rgba(229,83,75,.4)",
+              borderRadius: 10, padding: "6px 10px", display: "flex", alignItems: "center", gap: 4,
+            }}>
+              <span style={{ fontSize: 14 }}>⚡</span>
+              <span style={{ fontSize: 10, color: "#e5534b", fontWeight: 700 }}>TRIB</span>
+            </div>
+          )}
+        </div>
+
+        {/* Realm title */}
+        <div style={{ textAlign: "center", marginBottom: 6 }}>
+          <div style={{
+            fontFamily: "Cinzel", fontSize: 11, letterSpacing: 2,
+            color: "var(--muted)", textTransform: "uppercase", marginBottom: 4,
+          }}>
+            {player.sect_name} · {player.sect_rank}
+          </div>
+          <div style={{
+            fontFamily: "Cinzel", fontSize: 20, fontWeight: 700, color: col,
+            textShadow: `0 0 20px ${col}88`,
+          }}>
+            {REALM_NAMES[player.realm]}
+          </div>
+          <div style={{ fontSize: 13, color: "var(--muted)", marginTop: 2 }}>
+            {SUB_LABELS[player.sub_layer]} · {player.spirit_root} Spirit Root {player.spirit_root_emoji}
+          </div>
+        </div>
+
+        {/* Orb */}
+        <div style={{ padding: "12px 0 16px" }}>
+          <QiOrb realm={player.realm} active={player.meditation_active} />
+          {player.meditation_active && (
+            <div style={{ textAlign: "center", marginTop: 10 }}>
+              <div className="med-timer" style={{ color: col, textShadow: `0 0 14px ${col}88` }}>
+                {timer}
+              </div>
+              <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 2 }}>
+                {medTypes[player.meditation_type] || player.meditation_type}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* CB Progress */}
+        <div className="card" style={{ marginBottom: 10, borderColor: col + "44" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 6 }}>
+            <span style={{ fontSize: 12, color: "var(--muted)", fontWeight: 500 }}>Base de Cultivo</span>
+            <span style={{ fontSize: 12, color: col, fontWeight: 700 }}>{cbPct}%</span>
+          </div>
+          <div className="progress-track">
+            <div className="progress-fill" style={{
+              width: cbPct + "%",
+              background: `linear-gradient(90deg, ${col}88, ${col})`,
+              boxShadow: `0 0 8px ${col}88`,
+            }} />
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6, fontSize: 11, color: "var(--muted)" }}>
+            <span>{fmt(player.cb)}</span>
+            <span>→ {fmt(player.cb_threshold)}</span>
+          </div>
+        </div>
+
+        {/* HP / Qi */}
+        <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 10, color: "#e5534b", fontWeight: 600, marginBottom: 4 }}>
+              ❤️ HP {hpPct}%
+            </div>
+            <div className="progress-track">
+              <div className="progress-fill" style={{ width: hpPct + "%", background: "linear-gradient(90deg,#7f1d1d,#e5534b)" }} />
+            </div>
+          </div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 10, color: "#60a5fa", fontWeight: 600, marginBottom: 4 }}>
+              ☯️ Qi {qiPct}%
+            </div>
+            <div className="progress-track">
+              <div className="progress-fill" style={{ width: qiPct + "%", background: "linear-gradient(90deg,#1e40af,#60a5fa)" }} />
+            </div>
+          </div>
+        </div>
+
+        {/* Actions */}
+        {player.meditation_active ? (
+          <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+            <button className="btn btn-ghost" style={{ flex: 1 }}>⏹ Parar Meditação</button>
+            {player.tribulation_ready && (
+              <button className="btn btn-danger" style={{ flex: 1 }}>⚡ Tribulação!</button>
+            )}
+          </div>
+        ) : (
+          <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
+            <button className="btn btn-primary" style={{ flex: 1 }}>🧘 Meditação Leve</button>
+            <button className="btn btn-primary" style={{ flex: 1, background: "linear-gradient(135deg,#312e81,#7c3aed)" }}>🔮 Profunda</button>
+            {player.realm >= 4 && (
+              <button className="btn btn-primary" style={{ flex: "0 0 100%", background: "linear-gradient(135deg,#3b0764,#9333ea)" }}>💜 Vazio (R4+)</button>
+            )}
+          </div>
+        )}
+
+        {/* Alerts */}
+        {player.tribulation_ready && (
+          <div style={{
+            background: "rgba(229,83,75,.1)", border: "1px solid rgba(229,83,75,.4)",
+            borderRadius: 12, padding: "10px 14px", marginBottom: 12,
+            display: "flex", alignItems: "center", gap: 10,
+          }}>
+            <span style={{ fontSize: 20 }}>⚡</span>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: "#e5534b" }}>Tribulação Celestial Pronta!</div>
+              <div style={{ fontSize: 11, color: "var(--muted)" }}>Tensão acumulada — prepare-se para o teste do Dao</div>
+            </div>
+          </div>
+        )}
+
+        {/* Daily Quests */}
+        <div style={{ marginBottom: 16 }}>
+          <div className="section-title">Missões Diárias</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            {player.daily_quests.map((q, i) => (
+              <div key={i} className="list-item">
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <span style={{ fontSize: 14 }}>{q.done ? "✅" : "⭕"}</span>
+                  <span style={{ fontSize: 13, color: q.done ? "var(--muted)" : "var(--text)", textDecoration: q.done ? "line-through" : "none" }}>
+                    {q.name}
+                  </span>
+                </div>
+                {q.progress && !q.done && (
+                  <span style={{ fontSize: 12, color: "var(--warn)", fontWeight: 600 }}>{q.progress}</span>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Status info */}
+        <div style={{ marginBottom: 16 }}>
+          <div className="section-title">Status</div>
+          <div className="stat-grid">
+            <div className="stat-box">
+              <div className="stat-label">Poder de Combate</div>
+              <div className="stat-value" style={{ fontSize: 16, color: "#f59e0b" }}>{fmt(player.bp)}</div>
+            </div>
+            <div className="stat-box">
+              <div className="stat-label">Fragmentos Dao</div>
+              <div className="stat-value" style={{ fontSize: 16, color: "#a78bfa" }}>{player.dao_fragments}</div>
+            </div>
+            <div className="stat-box">
+              <div className="stat-label">Têmpera Corporal</div>
+              <div className="stat-value" style={{ fontSize: 16, color: "#3ecf7e" }}>{player.body_tempering}/{player.body_tempering_max}</div>
+            </div>
+            <div className="stat-box">
+              <div className="stat-label">Heart Demon</div>
+              <div className="stat-value" style={{ fontSize: 14, color: player.heart_demon_risk==="Low" ? "#3ecf7e" : "#e5534b" }}>
+                {player.heart_demon_risk === "Low" ? "✓ Baixo" : "⚠️ " + player.heart_demon_risk}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* World Feed */}
+        <div style={{ marginBottom: 16 }}>
+          <div className="section-title">Mundo Feed</div>
+          <div className="card">
+            {player.world_feed.map((f, i) => {
+              const dotCol = f.type === "boss" ? "#e5534b" : f.type === "sect" ? "#f59e0b" : f.type === "milestone" ? "#f472b6" : "#3ecf7e";
+              return (
+                <div key={i} className="feed-entry">
+                  <div className="feed-dot" style={{ background: dotCol, boxShadow: `0 0 6px ${dotCol}` }} />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 13 }}>{f.msg}</div>
+                    <div style={{ fontSize: 10, color: "var(--muted)", marginTop: 2 }}>{f.time}</div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────
+// SCREEN: COMBATE
+// ─────────────────────────────────────────────────────────
+const MASTERY_NAMES = ["", "Iniciante", "Aprendiz", "Hábil", "Mestre", "Transcendência"];
+function CombatScreen({ player }) {
+  const [arena, setArena] = useState("idle");
+
+  return (
+    <div className="screen-scroll screen-fade">
+      <div style={{ padding: "16px" }}>
+
+        {/* BP Hero */}
+        <div className="card" style={{ textAlign: "center", marginBottom: 14, background: "linear-gradient(160deg,#1a1040,#0d1422)", borderColor: "#3730a344" }}>
+          <div style={{ fontSize: 11, color: "var(--muted)", letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 4 }}>Poder de Combate</div>
+          <div style={{ fontFamily: "Cinzel", fontSize: 38, fontWeight: 700, color: "#f59e0b", textShadow: "0 0 20px #f59e0b88", lineHeight: 1 }}>
+            {fmt(player.bp)}
+          </div>
+          <div style={{ display: "flex", justifyContent: "center", gap: 20, marginTop: 12 }}>
+            {[["⚔️", "ATK", player.atk], ["🛡️", "DEF", player.def], ["💨", "EVA", player.evasion+"%"], ["🎯", "CRIT", player.crit+"%"]].map(([ic,lb,val]) => (
+              <div key={lb} style={{ textAlign: "center" }}>
+                <div style={{ fontSize: 16 }}>{ic}</div>
+                <div style={{ fontSize: 14, fontWeight: 700 }}>{fmt(typeof val === "number" ? val : val)}</div>
+                <div style={{ fontSize: 9, color: "var(--muted)", textTransform: "uppercase" }}>{lb}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Arena */}
+        <div className="section-title">Arena PvP</div>
+        <div className="card" style={{ marginBottom: 14, borderColor: "#e5534b33" }}>
+          {arena === "idle" && (
+            <div style={{ textAlign: "center", padding: "8px 0" }}>
+              <div style={{ fontSize: 13, color: "var(--muted)", marginBottom: 12 }}>
+                Matchmaking ELO ±200 · Realm 6 III
+              </div>
+              <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
+                <button className="btn btn-danger" onClick={() => setArena("searching")} style={{ flex: 1 }}>⚔️ Entrar na Arena</button>
+                <button className="btn btn-ghost" style={{ flex: 1 }}>🤝 Desafiar NPC</button>
+              </div>
+            </div>
+          )}
+          {arena === "searching" && (
+            <div style={{ textAlign: "center", padding: "8px 0" }}>
+              <div style={{ fontSize: 24, marginBottom: 6 }}>⚔️</div>
+              <div style={{ fontFamily: "Cinzel", fontSize: 14, color: "#e5534b", marginBottom: 8 }}>Procurando oponente...</div>
+              <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 12 }}>Timeout em 3:00</div>
+              <button className="btn btn-ghost" onClick={() => setArena("idle")}>Cancelar</button>
+            </div>
+          )}
+        </div>
+
+        {/* Techniques */}
+        <div className="section-title">Técnicas Equipadas</div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 14 }}>
+          {player.techniques.map((t, i) => (
+            <div key={i} style={{ background: "var(--panel)", border: "1px solid var(--border)", borderRadius: 12, padding: "12px 14px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                <div>
+                  <span style={{ fontWeight: 600, fontSize: 14 }}>{t.name}</span>
+                  <span style={{ marginLeft: 8, fontSize: 10, color: "var(--muted)", background: "var(--card)", padding: "2px 6px", borderRadius: 4 }}>{t.type}</span>
+                </div>
+                <span style={{ fontSize: 11, color: t.mastery >= 5 ? "#f59e0b" : "var(--muted)", fontWeight: 700 }}>
+                  {MASTERY_NAMES[t.mastery]}
+                </span>
+              </div>
+              <div className="progress-track">
+                <div className="progress-fill" style={{
+                  width: (t.mastery / t.mastery_max * 100) + "%",
+                  background: t.mastery >= 5 ? "linear-gradient(90deg,#92600a,#f59e0b)" : "linear-gradient(90deg,#3730a3,#8b5cf6)",
+                }} />
+              </div>
+              <div style={{ fontSize: 10, color: "var(--muted)", marginTop: 4, textAlign: "right" }}>
+                {t.mastery}/{t.mastery_max}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Quickactions */}
+        <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+          <button className="btn btn-ghost" style={{ flex: 1 }}>📜 Ver Técnicas</button>
+          <button className="btn btn-ghost" style={{ flex: 1 }}>🏆 Rankings</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────
+// SCREEN: MUNDO (World / Dungeons)
+// ─────────────────────────────────────────────────────────
+const DIFF_STYLES = {
+  "Normal":    { bg: "#065f46", color: "#3ecf7e" },
+  "Hard":      { bg: "#92400e", color: "#fbbf24" },
+  "Nightmare": { bg: "#7f1d1d", color: "#e5534b" },
+  "Insane":    { bg: "#4c1d95", color: "#a78bfa" },
+  "Celestial": { bg: "#1e1b4b", color: "#818cf8" },
+};
+
+function WorldScreen({ player }) {
+  const [tab, setTab] = useState("dungeons");
+
+  return (
+    <div className="screen-scroll screen-fade">
+      <div style={{ padding: "0 16px" }}>
+        {/* Sub-tabs */}
+        <div style={{ display: "flex", gap: 6, padding: "14px 0 12px", position: "sticky", top: 0, background: "var(--bg)", zIndex: 10 }}>
+          {[["dungeons","🗺️ Masmorras"],["boss","🐲 World Boss"],["rank","🏆 Ranking"]].map(([id, label]) => (
+            <button key={id} onClick={() => setTab(id)} style={{
+              flex: 1, border: tab === id ? "1px solid var(--border2)" : "1px solid var(--border)",
+              background: tab === id ? "var(--panel)" : "transparent",
+              color: tab === id ? "var(--text)" : "var(--muted)",
+              borderRadius: 8, padding: "7px 4px", fontSize: 11, fontWeight: 600,
+              cursor: "pointer", transition: "all .15s",
+            }}>{label}</button>
+          ))}
+        </div>
+
+        {/* Dungeons */}
+        {tab === "dungeons" && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 8, paddingBottom: 16 }}>
+            {player.dungeons.map((d, i) => {
+              const ds = DIFF_STYLES[d.difficulty] || DIFF_STYLES["Normal"];
+              const locked = player.realm < d.realm_req;
+              return (
+                <div key={i} className="dungeon-card" style={{ opacity: locked ? .5 : 1 }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 3 }}>
+                      {locked ? "🔒 " : ""}{d.name}
+                    </div>
+                    <div style={{ fontSize: 11, color: "var(--muted)" }}>
+                      Sucesso estimado: <span style={{ color: d.success > 60 ? "#3ecf7e" : d.success > 30 ? "#f59e0b" : "#e5534b", fontWeight: 700 }}>{d.success}%</span>
+                      {locked && <span style={{ marginLeft: 6 }}>· Req. R{d.realm_req}</span>}
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 6 }}>
+                    <span className="diff-badge" style={{ background: ds.bg, color: ds.color }}>{d.difficulty}</span>
+                    {!locked && <button className="btn btn-primary" style={{ fontSize: 11, padding: "6px 12px" }}>Entrar</button>}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* World Boss */}
+        {tab === "boss" && (
+          <div style={{ paddingBottom: 16 }}>
+            <div className="card" style={{ borderColor: "#e5534b44", background: "linear-gradient(160deg,#2d0a0a,#0d1422)", marginBottom: 12 }}>
+              <div style={{ textAlign: "center", padding: "8px 0 12px" }}>
+                <div style={{ fontSize: 40, marginBottom: 6 }}>🐉</div>
+                <div style={{ fontFamily: "Cinzel", fontSize: 18, fontWeight: 700, color: "#e5534b" }}>Azure Tyrant</div>
+                <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 2 }}>World Boss · Tier Spirit</div>
+              </div>
+              <div style={{ marginBottom: 12 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "var(--muted)", marginBottom: 4 }}>
+                  <span>HP do Boss</span><span style={{ color: "#e5534b" }}>78%</span>
+                </div>
+                <div className="progress-track">
+                  <div className="progress-fill" style={{ width: "78%", background: "linear-gradient(90deg,#7f1d1d,#e5534b)" }} />
+                </div>
+              </div>
+              <div style={{ fontSize: 12, color: "var(--muted)", textAlign: "center", marginBottom: 12 }}>
+                42 cultivadores a lutar · Termina em 5h 23m
+              </div>
+              <button className="btn btn-danger" style={{ width: "100%" }}>⚔️ Atacar World Boss</button>
+            </div>
+            <div className="section-title">Contribuições do Servidor</div>
+            {[["Yun_Ming","2.1M dmg","🥇"],["Celestial_Dao","1.8M dmg","🥈"],["Ardens Voidwalker","128K dmg","🥉"]].map(([n,d,m]) => (
+              <div key={n} className="list-item" style={{ marginBottom: 6 }}>
+                <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                  <span>{m}</span><span>{n}</span>
+                </div>
+                <span style={{ fontSize: 12, color: "#f59e0b", fontWeight: 700 }}>{d}</span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Ranking */}
+        {tab === "rank" && (
+          <div style={{ paddingBottom: 16 }}>
+            <div className="section-title">Top Poder de Combate</div>
+            {player.rankings.map((r, i) => (
+              <div key={i} className="list-item" style={{
+                marginBottom: 6,
+                borderColor: r.is_self ? "#8b5cf688" : "var(--border)",
+                background: r.is_self ? "rgba(139,92,246,.1)" : "var(--panel)",
+              }}>
+                <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                  <span style={{ fontFamily: "Cinzel", fontSize: 14, fontWeight: 700, color: ["#f59e0b","#9ca3af","#c9903a"][r.pos-1] || "var(--muted)", minWidth: 20 }}>
+                    {["🥇","🥈","🥉"][r.pos-1] || `#${r.pos}`}
+                  </span>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: r.is_self ? 700 : 400, color: r.is_self ? "#a78bfa" : "var(--text)" }}>
+                      {r.name}{r.is_self ? " (você)" : ""}
+                    </div>
+                    <div style={{ fontSize: 10, color: "var(--muted)" }}>
+                      {REALM_EMOJI[r.realm]} {REALM_NAMES[r.realm]}
+                    </div>
+                  </div>
+                </div>
+                <span style={{ fontSize: 13, fontWeight: 700, color: "#f59e0b" }}>{fmt(r.bp)}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────
+// SCREEN: ARTESANATO (Alchemy + Forge)
+// ─────────────────────────────────────────────────────────
+function CraftScreen({ player }) {
+  const [tab, setTab] = useState("alchemy");
+
+  return (
+    <div className="screen-scroll screen-fade">
+      <div style={{ padding: "0 16px" }}>
+        <div style={{ display: "flex", gap: 6, padding: "14px 0 12px", position: "sticky", top: 0, background: "var(--bg)", zIndex: 10 }}>
+          {[["alchemy","⚗️ Alquimia"],["forge","🔨 Forja"],["inventory","🎒 Inventário"]].map(([id, label]) => (
+            <button key={id} onClick={() => setTab(id)} style={{
+              flex: 1, border: tab === id ? "1px solid var(--border2)" : "1px solid var(--border)",
+              background: tab === id ? "var(--panel)" : "transparent",
+              color: tab === id ? "var(--text)" : "var(--muted)",
+              borderRadius: 8, padding: "7px 4px", fontSize: 11, fontWeight: 600,
+              cursor: "pointer", transition: "all .15s",
+            }}>{label}</button>
+          ))}
+        </div>
+
+        {tab === "alchemy" && (
+          <div style={{ paddingBottom: 16 }}>
+            <div className="card" style={{ marginBottom: 12, borderColor: "#78350f44" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
+                <div style={{ fontSize: 32 }}>⚗️</div>
+                <div>
+                  <div style={{ fontWeight: 700, fontSize: 14 }}>{player.cauldron}</div>
+                  <div style={{ fontSize: 12, color: "var(--muted)" }}>Soul Fire Tier {player.soul_fire_tier} 🔥</div>
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: 8 }}>
+                {[["Heavenly Pill","2.6%","#f472b6"],["Pill Trib.","se Heavenly","#a78bfa"]].map(([k,v,c]) => (
+                  <div key={k} style={{ flex: 1, background: "var(--card)", borderRadius: 8, padding: "8px 10px", border: "1px solid var(--border)" }}>
+                    <div style={{ fontSize: 10, color: "var(--muted)", textTransform: "uppercase" }}>{k}</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: c }}>{v}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="section-title">Pills Disponíveis</div>
+            {[
+              ["Spirit Restoration Pill","T3","⚗️","Restaura 40% Qi",30],
+              ["Foundation Reinforcement Pill","T4","💊","Reforça a base",20],
+              ["Cleansing Pill","T2","🌿","Remove impurezas",45],
+              ["Heaven Earth Pill","T5","💎","Aumenta CB 5%",8],
+            ].map(([name,tier,ic,desc,energy]) => (
+              <div key={name} style={{ marginBottom: 8 }}>
+                <div style={{ background: "var(--panel)", border: "1px solid var(--border)", borderRadius: 12, padding: "12px 14px" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <span>{ic}</span>
+                        <span style={{ fontWeight: 600, fontSize: 13 }}>{name}</span>
+                        <span style={{ fontSize: 10, color: "var(--muted)", background: "var(--card)", padding: "1px 6px", borderRadius: 4 }}>{tier}</span>
+                      </div>
+                      <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 2 }}>{desc} · {energy} energia</div>
+                    </div>
+                    <button className="btn" style={{ background: "linear-gradient(135deg,#78350f,#c9903a)", color: "#fff5dc", fontSize: 12, padding: "6px 12px" }}>
+                      Criar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {tab === "forge" && (
+          <div style={{ paddingBottom: 16 }}>
+            <div className="section-title">Equipamento Ativo</div>
+            {[[player.weapon,"⚔️","Arma"],[player.armor,"🛡️","Armadura"]].map(([name,ic,slot]) => (
+              <div key={slot} className="card" style={{ marginBottom: 10 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                    <span style={{ fontSize: 24 }}>{ic}</span>
+                    <div>
+                      <div style={{ fontWeight: 600, fontSize: 14 }}>{name}</div>
+                      <div style={{ fontSize: 11, color: "var(--muted)" }}>{slot} · Grau Heaven</div>
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                    <button className="btn btn-gold" style={{ fontSize: 11, padding: "5px 10px" }}>Refinar</button>
+                    <button className="btn btn-ghost" style={{ fontSize: 11, padding: "5px 10px" }}>Encantar</button>
+                  </div>
+                </div>
+              </div>
+            ))}
+            <div className="section-title" style={{ marginTop: 6 }}>Receitas de Forja</div>
+            {[
+              ["Void Emperor Blade","Tier 6","Celestial Iron + Dragon Core","Mahayana+"],
+              ["Storm Silk Robe","Tier 5","Spirit Silk + Void Fragment","Void Refin.+"],
+            ].map(([name,tier,mats,req]) => (
+              <div key={name} className="dungeon-card" style={{ marginBottom: 8 }}>
+                <div>
+                  <div style={{ fontWeight: 600, fontSize: 13 }}>{name}</div>
+                  <div style={{ fontSize: 10, color: "var(--muted)", marginTop: 2 }}>{mats}</div>
+                  <div style={{ fontSize: 10, color: "#f59e0b", marginTop: 1 }}>Req: {req}</div>
+                </div>
+                <button className="btn btn-ghost" style={{ fontSize: 11 }}>Forjar</button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {tab === "inventory" && (
+          <div style={{ paddingBottom: 16 }}>
+            <div className="section-title">Anel Espacial</div>
+            {[
+              ["Spirit Restoration Pill","Consumível","×12","💊"],
+              ["Iron Dragon Ore","Material","×3","⚫"],
+              ["Ancient Qi Herb","Erva","×8","🌿"],
+              ["Beast Core (Rare)","Material","×5","💎"],
+              ["Fortune Incense","Consumível","×2","🕯️"],
+              ["Tribulation Shield Talisman","Talisman","×1","🛡️"],
+            ].map(([name,type,qty,ic]) => (
+              <div key={name} className="list-item" style={{ marginBottom: 6 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <span style={{ fontSize: 18 }}>{ic}</span>
+                  <div>
+                    <div style={{ fontSize: 13 }}>{name}</div>
+                    <div style={{ fontSize: 10, color: "var(--muted)" }}>{type}</div>
+                  </div>
+                </div>
+                <span style={{ fontSize: 13, fontWeight: 700, color: "var(--muted)" }}>{qty}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────
+// SCREEN: PERFIL
+// ─────────────────────────────────────────────────────────
+function ProfileScreen({ player }) {
+  const col = REALM_COLORS[player.realm];
+  return (
+    <div className="screen-scroll screen-fade">
+      <div style={{ padding: "16px" }}>
+
+        {/* Identity card */}
+        <div className="card" style={{ marginBottom: 14, borderColor: col + "44", textAlign: "center", padding: "20px 16px" }}>
+          <div style={{
+            width: 64, height: 64, borderRadius: "50%",
+            background: `radial-gradient(circle at 35% 35%, ${col}cc, ${col}22)`,
+            border: `2px solid ${col}88`,
+            margin: "0 auto 10px",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: 28,
+          }}>{REALM_EMOJI[player.realm]}</div>
+          <div style={{ fontFamily: "Cinzel", fontSize: 18, fontWeight: 700, color: col }}>{player.dao_name}</div>
+          <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 4 }}>
+            {REALM_NAMES[player.realm]} {SUB_LAYERS_PER_REALM > 1 ? SUB_LABELS[player.sub_layer] : ""} · {player.spirit_root} Spirit Root
+          </div>
+          <div style={{ marginTop: 10, display: "flex", justifyContent: "center", gap: 8 }}>
+            <span className="badge" style={{ borderColor: player.faction === "Celestial" ? "#fbbf24" : "#e5534b", color: player.faction === "Celestial" ? "#fbbf24" : "#e5534b", background: "transparent" }}>
+              {player.faction_emoji} {player.faction}
+            </span>
+            <span className="badge" style={{ borderColor: "var(--border2)", color: "var(--muted)" }}>
+              {player.sect_rank} · {player.sect_name}
+            </span>
+          </div>
+        </div>
+
+        {/* Full stats */}
+        <div className="section-title">Estatísticas</div>
+        <div className="stat-grid" style={{ marginBottom: 14 }}>
+          {[
+            ["Base de Cultivo", fmt(player.cb), col],
+            ["Battle Power", fmt(player.bp), "#f59e0b"],
+            ["ATK", fmt(player.atk), "#e5534b"],
+            ["DEF", fmt(player.def), "#60a5fa"],
+            ["Evasão", player.evasion + "%", "#3ecf7e"],
+            ["Crit", player.crit + "%", "#f472b6"],
+            ["Têmpera", player.body_tempering + "/" + player.body_tempering_max, "#c9903a"],
+            ["Fragmentos Dao", player.dao_fragments, "#a78bfa"],
+          ].map(([label, val, clr]) => (
+            <div key={label} className="stat-box">
+              <div className="stat-label">{label}</div>
+              <div className="stat-value" style={{ fontSize: 15, color: clr }}>{val}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Achievements */}
+        <div className="section-title">Conquistas</div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
+          {player.achievements.map((a, i) => (
+            <div key={i} className="achievement" style={{ opacity: a.done ? 1 : .45 }}>
+              <div className="achievement-icon" style={{ background: a.done ? "rgba(201,144,58,.2)" : "rgba(255,255,255,.04)", border: `1px solid ${a.done ? "#c9903a44" : "var(--border)"}` }}>
+                {a.icon}
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: a.done ? "var(--text)" : "var(--muted)" }}>{a.name}</div>
+                <div style={{ fontSize: 11, color: "var(--muted)" }}>{a.desc}</div>
+              </div>
+              {a.done && <span style={{ color: "#3ecf7e", fontSize: 16 }}>✓</span>}
+            </div>
+          ))}
+        </div>
+
+        {/* Dao Laws snapshot */}
+        <div className="section-title">Leis do Dao</div>
+        <div className="card" style={{ marginBottom: 16 }}>
+          {[["Spatial Law",68],["Martial Law",41],["Thunder Law",19]].map(([name,pct_val]) => (
+            <div key={name} style={{ marginBottom: 10 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 4 }}>
+                <span style={{ color: "var(--muted)" }}>{name}</span>
+                <span style={{ color: "#a78bfa", fontWeight: 700 }}>{pct_val}/100 Leis</span>
+              </div>
+              <div className="progress-track">
+                <div className="progress-fill" style={{ width: pct_val + "%", background: "linear-gradient(90deg,#312e81,#a78bfa)" }} />
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Prestige */}
+        <div className="card" style={{ marginBottom: 16, borderColor: "#f472b633" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 600 }}>Prestígio / Renascimento</div>
+              <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 2 }}>Disponível ao atingir True Immortal IX</div>
+            </div>
+            <button className="btn btn-ghost" style={{ fontSize: 12, opacity: .5 }} disabled>🌸 Ren.</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const SUB_LAYERS_PER_REALM = 9;
+
+// ─────────────────────────────────────────────────────────
+// BOTTOM NAV
+// ─────────────────────────────────────────────────────────
+const TABS = [
+  { id: "home",    label: "Cultivar",  icon: "☯️" },
+  { id: "combat",  label: "Combate",   icon: "⚔️" },
+  { id: "world",   label: "Mundo",     icon: "🗺️" },
+  { id: "craft",   label: "Artesanato",icon: "⚗️" },
+  { id: "profile", label: "Perfil",    icon: "👤" },
+];
+
+function BottomNav({ tab, setTab }) {
+  return (
+    <div className="bottom-nav">
+      {TABS.map(t => (
+        <button key={t.id} className={"nav-item" + (tab === t.id ? " active" : "")} onClick={() => setTab(t.id)}>
+          <span className="nav-icon">{t.icon}</span>
+          <span className="nav-label" style={{ color: tab === t.id ? "var(--text)" : undefined }}>{t.label}</span>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────
+// TOP HEADER
+// ─────────────────────────────────────────────────────────
+function TopHeader({ player, tab }) {
+  const col = REALM_COLORS[player.realm];
+  const titles = { home: player.dao_name, combat: "Combate", world: "Mundo", craft: "Artesanato", profile: "Perfil" };
+  return (
+    <div className="top-header">
+      <div>
+        <div style={{ fontFamily: "Cinzel", fontSize: 14, fontWeight: 700, color: col }}>{titles[tab]}</div>
+        {tab === "home" && (
+          <div style={{ fontSize: 10, color: "var(--muted)", marginTop: 1 }}>
+            {REALM_EMOJI[player.realm]} {REALM_NAMES[player.realm]} {SUB_LABELS[player.sub_layer]}
+          </div>
+        )}
+      </div>
+      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <div style={{ fontSize: 10, color: "var(--muted)", textAlign: "right" }}>
+          <div style={{ color: "#3ecf7e", fontWeight: 700 }}>● ONLINE</div>
+          <div>Beta v1.0</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────
+// LOADING SPLASH
+// ─────────────────────────────────────────────────────────
+function LoadingSplash() {
+  return (
+    <div style={{
+      display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+      height: "100%", gap: 20, background: "var(--bg)",
+    }}>
+      <div style={{ position: "relative", width: 80, height: 80 }}>
+        <div style={{
+          position: "absolute", inset: 0, borderRadius: "50%",
+          background: "radial-gradient(circle at 35% 35%, #8b5cf6cc, #8b5cf644 55%, transparent)",
+          boxShadow: "0 0 30px #8b5cf666",
+          animation: "orb-pulse 2s ease-in-out infinite",
+        }} />
+        <div style={{
+          position: "absolute", inset: -8, borderRadius: "50%",
+          border: "1px solid #8b5cf644",
+          animation: "orb-ring 2s ease-out infinite",
+        }} />
+        <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28 }}>
+          🐉
+        </div>
+      </div>
+      <div style={{ textAlign: "center" }}>
+        <div style={{ fontFamily: "Cinzel", fontSize: 22, fontWeight: 700, color: "#8b5cf6", textShadow: "0 0 16px #8b5cf688" }}>
+          NIVRAEL
+        </div>
+        <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 4, letterSpacing: 2 }}>
+          CARREGANDO CULTIVO...
+        </div>
+      </div>
+      <div style={{ display: "flex", gap: 4 }}>
+        {[0,1,2].map(i => (
+          <div key={i} style={{
+            width: 6, height: 6, borderRadius: "50%", background: "#8b5cf6",
+            animation: `orb-pulse 1s ease-in-out ${i * 0.3}s infinite`,
+          }} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────
+// DEMO BANNER (shown when not inside Telegram or no API)
+// ─────────────────────────────────────────────────────────
+function DemoBanner() {
+  const [hidden, setHidden] = useState(false);
+  if (hidden) return null;
+  return (
+    <div style={{
+      background: "rgba(124,58,237,.15)", borderBottom: "1px solid rgba(124,58,237,.3)",
+      padding: "6px 14px", display: "flex", alignItems: "center", justifyContent: "space-between",
+      fontSize: 11, color: "#a78bfa", zIndex: 200,
+    }}>
+      <span>🎮 Modo Demo — dados mock · API não conectada</span>
+      <button onClick={() => setHidden(true)} style={{ background: "none", border: "none", color: "#a78bfa", cursor: "pointer", fontSize: 14 }}>×</button>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────
+// ROOT APP
+// ─────────────────────────────────────────────────────────
+function App() {
+  const [tab, setTab] = useState("home");
+  const [player, setPlayer] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [isDemo, setIsDemo] = useState(true);
+
+  useEffect(() => {
+    // Init Telegram WebApp
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+      tg.ready();
+      tg.expand();
+      tg.setHeaderColor?.("#06080f");
+      tg.setBackgroundColor?.("#06080f");
+    }
+
+    async function loadPlayer() {
+      try {
+        if (API_BASE && tg?.initData) {
+          const res = await fetch(`${API_BASE}/api/miniapp/player`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ init_data: tg.initData }),
+          });
+          if (res.ok) {
+            const data = await res.json();
+            setPlayer(data);
+            setIsDemo(false);
+            return;
+          }
+        }
+      } catch (e) {
+        console.log("API unavailable, using demo mode:", e.message);
+      }
+      // Fallback to mock
+      await new Promise(r => setTimeout(r, 1200)); // splash delay
+      setPlayer(MOCK_PLAYER);
+      setIsDemo(true);
+    }
+
+    loadPlayer().finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return <LoadingSplash />;
+  if (!player)  return <LoadingSplash />;
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }}>
+      {isDemo && <DemoBanner />}
+      <TopHeader player={player} tab={tab} />
+      <div style={{ flex: 1, overflow: "hidden", position: "relative" }}>
+        {tab === "home"    && <HomeScreen    player={player} />}
+        {tab === "combat"  && <CombatScreen  player={player} />}
+        {tab === "world"   && <WorldScreen   player={player} />}
+        {tab === "craft"   && <CraftScreen   player={player} />}
+        {tab === "profile" && <ProfileScreen player={player} />}
+      </div>
+      <BottomNav tab={tab} setTab={setTab} />
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>

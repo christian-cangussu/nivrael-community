@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Noto+Serif+SC:wght@700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#06080f;padding:20px 24px;color:#e2eaff;display:flex;flex-direction:column;gap:12px}
+
+@keyframes drift{0%{transform:translate(0,0);opacity:.05}50%{opacity:.09}100%{transform:translate(12px,-18px);opacity:.05}}
+@keyframes fade-up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes breathe{0%,100%{transform:scale(1);opacity:.7}50%{transform:scale(1.04);opacity:1}}
+@keyframes pulse-glow{0%,100%{box-shadow:0 0 12px rgba(85,140,255,.3)}50%{box-shadow:0 0 24px rgba(85,140,255,.7)}}
+
+.row{display:flex;align-items:center;gap:16px;padding:8px 0;border-bottom:1px solid rgba(60,90,180,.12)}
+.row:last-child{border-bottom:none}
+.demo{flex-shrink:0;width:120px;height:32px;display:flex;align-items:center;justify-content:center}
+.meta{font-size:10px;color:#3d5a9e;font-family:monospace;line-height:1.6}
+
+/* Demos */
+.shimmer-text{font-family:'Cinzel',serif;font-size:22px;font-weight:600;background:linear-gradient(90deg,#c9903a,#f5c97a,#c9903a);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:shimmer 2.5s linear infinite}
+.fade-card{background:rgba(17,29,53,.8);border:1px solid #1e3060;border-radius:10px;padding:6px 12px;font-size:12px;animation:fade-up .35s ease both}
+.glyph-drift{font-family:'Noto Serif SC',serif;font-size:40px;font-weight:700;color:rgba(201,144,58,.07);animation:drift 8s ease-in-out infinite}
+.breathe-orb{width:32px;height:32px;border-radius:50%;background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.5),transparent 45%),radial-gradient(circle at 50% 50%,#6b9eff,#1f3c8a);animation:breathe 4s ease-in-out infinite}
+.pulse-btn{padding:7px 14px;border-radius:10px;border:1px solid #c9903a;background:linear-gradient(180deg,rgba(201,144,58,.3),rgba(120,80,30,.5));color:#f5c97a;font-family:'Cinzel',serif;font-size:11px;animation:pulse-glow 2.5s ease-in-out infinite}
+.scale-btn{padding:7px 14px;border-radius:10px;border:1px solid #1e3060;background:rgba(17,29,53,.7);color:#e2eaff;font-family:'Cinzel',serif;font-size:11px;transition:transform .1s}
+.scale-btn:active{transform:scale(.97)}
+</style></head>
+<body>
+  <div class="row">
+    <div class="demo"><div class="shimmer-text">道</div></div>
+    <div class="meta">shimmer — 2.5s linear<br>Gold gradient sweep<br>Loading glyph, Dao name</div>
+  </div>
+  <div class="row">
+    <div class="demo"><div class="fade-card">Alma Nascente · 4</div></div>
+    <div class="meta">fade-up — 0.35s ease<br>opacity 0→1, Y 8→0<br>Card/item entrance</div>
+  </div>
+  <div class="row">
+    <div class="demo"><div class="glyph-drift">道</div></div>
+    <div class="meta">drift — 14s ease-in-out<br>translate + opacity pulse<br>Background glyphs</div>
+  </div>
+  <div class="row">
+    <div class="demo"><div class="breathe-orb"></div></div>
+    <div class="meta">orb-breathe — 4s ease<br>scale 1→1.045 + brightness<br>Cultivation orb</div>
+  </div>
+  <div class="row">
+    <div class="demo"><button class="pulse-btn">Meditar</button></div>
+    <div class="meta">pulse-glow — 2.5s ease<br>box-shadow oscillation<br>Active/primary states</div>
+  </div>
+  <div class="row">
+    <div class="demo"><button class="scale-btn">Atacar</button></div>
+    <div class="meta">press: scale(.97) — 0.1s<br>Haptic + TG vibration<br>All interactive elements</div>
+  </div>
+</body></html>

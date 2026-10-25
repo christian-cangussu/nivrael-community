@@ -1,0 +1,24 @@
+-- Migration 123 — Sprint 3: Cultivo do Corpo @ R0, A AÇÃO (temperar a Carne Mortal)
+-- Prompts/sprint3_cultivo_corpo_acao.md (travada 2026-06-29). ADDITIVE + WIPE-SAFE.
+--
+-- Adds the OWN counter for the Mortal Flesh band (Pele → Vísceras), the R0–R6
+-- early-game body axis. SEPARATE from `body_tempering_level` (the R7+ Nine
+-- Transformations counter of the 57) so the two bands never collide and there is
+-- NO transition exploit ("cheap Mortal 7 → free Transformation 7 at R7"):
+--   * body_tempering_level — R7+ Nine Transformations (0..12). Untouched.
+--   * mortal_body_level (NEW) — R0–R6 Mortal band (0..7). Gives DURABILITY
+--                     (HP/DEF via MORTAL_BAND.hp_def_mult), NEVER qi_capacity
+--                     (the Wall, not the fuel — BC-5). Engine: core.body_tempering_engine.
+--
+-- ⚠️ REGRA DE FERRO DOS 57 (Lei §1): NOT NULL DEFAULT 0 → every existing player
+-- (the 57 on `main`) lands at 0 = NEUTRAL. NOTHING reads mortal_body_level for
+-- mechanics on `main`: `cultivo_corpo_r0` is OFF there, so body_durability_mult
+-- returns 1.0 (combat byte-identical) and the temper ACTION refuses. The ONLY
+-- write happens via the gated Mortal temper action (mini-app world/body_temper or
+-- /corpo) in a world where `cultivo_corpo_r0` is ON AND realm < 7. `main` keeps
+-- the flag OFF (defaults are ironclad) → double blindage.
+--
+-- IMPORTANT: comments here are FULL-LINE only. An inline "--" comment containing a
+-- stray ";" would split a statement mid-flight (see migration 108 prod crash).
+
+ALTER TABLE players ADD COLUMN IF NOT EXISTS mortal_body_level INTEGER NOT NULL DEFAULT 0;

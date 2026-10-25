@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS player_alchemy_skills (
+    player_id BIGINT PRIMARY KEY REFERENCES players(telegram_id) ON DELETE CASCADE,
+    tier INTEGER DEFAULT 1 NOT NULL,
+    xp INTEGER DEFAULT 0 NOT NULL,
+    total_crafts INTEGER DEFAULT 0 NOT NULL,
+    divine_crafts INTEGER DEFAULT 0 NOT NULL
+);
+ALTER TABLE pills_catalog ADD COLUMN IF NOT EXISTS required_alchemy_tier INTEGER DEFAULT 1

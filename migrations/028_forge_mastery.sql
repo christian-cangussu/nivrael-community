@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS player_forge_skills (
+    player_id BIGINT PRIMARY KEY REFERENCES players(telegram_id) ON DELETE CASCADE,
+    tier INTEGER DEFAULT 1 NOT NULL,
+    xp INTEGER DEFAULT 0 NOT NULL,
+    total_forges INTEGER DEFAULT 0 NOT NULL
+);

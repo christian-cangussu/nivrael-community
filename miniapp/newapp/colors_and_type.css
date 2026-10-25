@@ -1,0 +1,286 @@
+/*
+ * Nivrael — Caminho da Imortalidade
+ * Design System: Colors & Typography
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Fonts: Google Fonts CDN (Cinzel + Noto Serif SC + Noto Sans)
+ * No local font files provided — using CDN. For offline use, download and
+ * reference from fonts/ directory.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Noto+Sans:wght@300;400;500;600&family=Noto+Serif+SC:wght@500;700&display=swap');
+
+/* ─── Base Reset ──────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Typography Families ─────────────────────────────────────────────────── */
+:root {
+  --font-display:   'Cinzel', 'Times New Roman', serif;
+  --font-chinese:   'Noto Serif SC', 'STSong', serif;
+  --font-body:      'Noto Sans', system-ui, sans-serif;
+}
+
+/* ─── Color Palette ───────────────────────────────────────────────────────── */
+:root {
+  /* Backgrounds */
+  --bg:             #06080f;   /* App background — deep bluish-black */
+  --bg-mid:         #080c16;   /* Slightly lighter bg variant */
+  --card:           #0d1422;   /* Card surface */
+  --panel:          #111d35;   /* Elevated panel */
+
+  /* Borders */
+  --border:         #1e3060;   /* Default border */
+  --border2:        #253f7a;   /* Highlighted border */
+  --border-dashed:  rgba(60, 90, 180, 0.18); /* Subtle row separator */
+
+  /* Text */
+  --text:           #e2eaff;   /* Primary text — cool blue-white */
+  --muted:          #6e89bf;   /* Secondary / label text */
+  --muted2:         #3d5a9e;   /* Inactive / ghost text */
+
+  /* Accent — Gold */
+  --gold:           #c9903a;   /* Patinated gold — borders, highlights */
+  --gold2:          #f5c97a;   /* Light gold — values, active states */
+  --gold-glow:      rgba(201, 144, 58, 0.30); /* Gold glow layer */
+
+  /* Accent — Jade */
+  --jade:           #3ecf7e;   /* Jade green — success, positive */
+  --jade-bg:        rgba(62, 207, 126, 0.18);
+  --jade-border:    rgba(62, 207, 126, 0.35);
+
+  /* Accent — Purple */
+  --purple:         #6b21a8;   /* Imperial purple */
+  --purple-light:   #a855f7;   /* Violet — realm 3 */
+
+  /* Semantic */
+  --red:            #e5534b;   /* Danger / HP bar */
+  --red-bg:         rgba(229, 83, 75, 0.16);
+  --red-border:     rgba(229, 83, 75, 0.35);
+  --warn:           #f59e0b;   /* Warning / elder badge */
+  --warn-bg:        rgba(245, 158, 11, 0.16);
+  --warn-border:    rgba(245, 158, 11, 0.35);
+
+  /* Realm Colors (per-realm accent; apply to orb, pill, glow) */
+  --realm-0:  #9ca3af;   /* Mortal           — stone grey */
+  --realm-1:  #60a5fa;   /* Qi Condensation  — sky blue */
+  --realm-2:  #fbbf24;   /* Foundation       — amber */
+  --realm-3:  #a855f7;   /* Core Formation   — violet */
+  --realm-4:  #2dd4bf;   /* Nascent Soul     — teal */
+  --realm-5:  #3b82f6;   /* Soul Transform.  — blue */
+  --realm-6:  #8b5cf6;   /* Void Refinement  — indigo */
+  --realm-7:  #f59e0b;   /* Body Integration — gold */
+  --realm-8:  #38bdf8;   /* Mahayana         — cosmic cyan */
+  --realm-9:  #eab308;   /* Tribulation      — lightning yellow */
+  --realm-10: #f472b6;   /* True Immortal    — rose-gold legendary */
+}
+
+/* ─── Spacing Scale ───────────────────────────────────────────────────────── */
+:root {
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  14px;
+  --space-5:  16px;
+  --space-6:  20px;
+  --space-7:  24px;
+  --space-8:  32px;
+
+  /* Layout */
+  --content-max-width: 480px;
+  --content-padding: 12px 14px 90px;  /* bottom = tabbar clearance */
+  --card-padding: 14px;
+  --card-gap: 12px;
+}
+
+/* ─── Border Radius ───────────────────────────────────────────────────────── */
+:root {
+  --radius-pill:   999px;
+  --radius-card:   14px;
+  --radius-inner:  10px;
+  --radius-cell:   8px;
+  --radius-bar:    6px;
+  --radius-btn:    10px;
+}
+
+/* ─── Shadows & Glows ─────────────────────────────────────────────────────── */
+:root {
+  --shadow-orb:        0 0 40px rgba(85,140,255,.45), inset 0 0 20px rgba(180,210,255,.35);
+  --shadow-orb-meditate: 0 0 60px rgba(168,85,247,.55), inset 0 0 22px rgba(220,200,255,.4);
+  --shadow-equipped:   inset 0 0 8px rgba(201,144,58,.30);
+  --shadow-boss:       drop-shadow(0 0 12px rgba(255,80,80,.50));
+}
+
+/* ─── Typography Scale ────────────────────────────────────────────────────── */
+:root {
+  /* Base type sizes */
+  --text-xs:   10px;
+  --text-sm:   11px;
+  --text-base: 13px;
+  --text-md:   15px;
+  --text-lg:   18px;
+  --text-xl:   24px;
+  --text-2xl:  32px;
+
+  /* Semantic roles */
+  --type-dao-name:    700 18px/1.2 var(--font-display);   /* Player name, gold gradient */
+  --type-card-title:  400 12px/1   var(--font-display);   /* Card heading, UPPERCASE */
+  --type-section:     600 14px/1.3 var(--font-display);   /* Section heading */
+  --type-boss-name:   600 18px/1.2 var(--font-display);   /* Boss name */
+  --type-stat-label:  400 10px/1   var(--font-body);      /* Stat label, UPPERCASE */
+  --type-stat-value:  600 15px/1.2 var(--font-body);      /* Stat value */
+  --type-body:        400 13px/1.5 var(--font-body);      /* Body text */
+  --type-caption:     400 11px/1.4 var(--font-body);      /* Muted captions */
+  --type-badge:       600 10px/1   var(--font-body);      /* Badge labels */
+  --type-tab:         500 10px/1   var(--font-body);      /* Tab bar labels */
+  --type-chinese-bg:  700 110px/1  var(--font-chinese);   /* Background glyphs */
+  --type-orb-glyph:   700 56px/1   var(--font-chinese);   /* Orb center glyph */
+}
+
+/* ─── Semantic Type Classes ───────────────────────────────────────────────── */
+
+/* Display heading — Cinzel, gold gradient */
+.type-display {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  background: linear-gradient(90deg, var(--gold2), var(--gold));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 0.5px;
+}
+
+/* Card title — Cinzel, muted, uppercase */
+.type-card-title {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Stat label */
+.type-stat-label {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--muted);
+}
+
+/* Stat value */
+.type-stat-value {
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Body text */
+.type-body {
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+/* Muted caption */
+.type-caption {
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: var(--muted);
+}
+
+/* Chinese glyph — decorative */
+.type-glyph {
+  font-family: var(--font-chinese);
+  font-weight: 700;
+  color: rgba(201, 144, 58, 0.06); /* ghost gold */
+}
+
+/* ─── App-level Background ────────────────────────────────────────────────── */
+.nivrael-bg {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(60,90,180,.18), transparent 60%),
+    radial-gradient(circle at 50% 100%, rgba(140,80,200,.12), transparent 65%),
+    var(--bg);
+}
+
+/* ─── Card Surface ────────────────────────────────────────────────────────── */
+.nivrael-card {
+  background: linear-gradient(180deg, rgba(17,29,53,.85), rgba(13,20,34,.85));
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: var(--card-padding);
+}
+
+/* ─── Progress Bar Base ───────────────────────────────────────────────────── */
+.nivrael-bar {
+  width: 100%;
+  height: 7px;
+  background: rgba(255,255,255,.05);
+  border-radius: var(--radius-bar);
+  overflow: hidden;
+  border: 1px solid rgba(60,90,180,.18);
+}
+.nivrael-bar > div {
+  height: 100%;
+  border-radius: var(--radius-bar);
+  transition: width .35s ease;
+}
+.nivrael-bar.qi    > div { background: linear-gradient(90deg, #4cc4ff, #7be3ff); }
+.nivrael-bar.cult  > div { background: linear-gradient(90deg, var(--gold), var(--gold2)); }
+.nivrael-bar.hp    > div { background: linear-gradient(90deg, #ff6b6b, #ffa07a); }
+
+/* ─── Badge Variants ──────────────────────────────────────────────────────── */
+.nivrael-badge {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: var(--radius-pill);
+  font-size: 10px;
+  font-weight: 600;
+  background: var(--jade-bg);
+  color: var(--jade);
+  border: 1px solid var(--jade-border);
+}
+.nivrael-badge.warn { background: var(--warn-bg); color: var(--warn); border-color: var(--warn-border); }
+.nivrael-badge.red  { background: var(--red-bg);  color: var(--red);  border-color: var(--red-border); }
+
+/* ─── Standard Animations ─────────────────────────────────────────────────── */
+@keyframes niv-orb-breathe {
+  0%, 100% { transform: scale(1); filter: brightness(1); }
+  50%       { transform: scale(1.045); filter: brightness(1.18); }
+}
+@keyframes niv-orb-ring-out {
+  0%   { transform: scale(.85); opacity: .6; }
+  100% { transform: scale(1.55); opacity: 0; }
+}
+@keyframes niv-qi-rise {
+  0%   { transform: translateY(0) translateX(0) scale(1); opacity: .85; }
+  100% { transform: translateY(-110px) translateX(var(--dx, 18px)) scale(0); opacity: 0; }
+}
+@keyframes niv-fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes niv-shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes niv-drift {
+  0%   { transform: translate(0, 0); opacity: .04; }
+  50%  { opacity: .08; }
+  100% { transform: translate(20px, -30px); opacity: .04; }
+}
+@keyframes niv-pulse-glow {
+  0%, 100% { opacity: .5; }
+  50%       { opacity: 1; }
+}

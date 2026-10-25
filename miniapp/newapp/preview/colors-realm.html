@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Noto+Sans:wght@400;600&family=Noto+Serif+SC:wght@700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#06080f;font-family:'Noto Sans',sans-serif;padding:16px 20px;color:#e2eaff}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.realm{border-radius:12px;padding:12px 10px 10px;border:1px solid rgba(255,255,255,.08);background:rgba(13,20,34,.7);text-align:center;position:relative;overflow:hidden}
+.realm::before{content:'';position:absolute;inset:0;opacity:.12;border-radius:12px}
+.glyph{font-family:'Noto Serif SC',serif;font-size:22px;font-weight:700;margin-bottom:6px}
+.num{font-size:9px;color:#3d5a9e;font-weight:600;letter-spacing:.5px;text-transform:uppercase}
+.name{font-family:'Cinzel',serif;font-size:9px;font-weight:600;margin-top:3px;letter-spacing:.3px;line-height:1.3}
+.bar{height:3px;border-radius:3px;margin-top:8px;opacity:.6}
+</style></head>
+<body>
+<div class="grid">
+  <div class="realm" style="border-color:#9ca3af44"><div class="glyph" style="color:#9ca3af">凡</div><div class="num">Realm 0</div><div class="name" style="color:#9ca3af">Mortal</div><div class="bar" style="background:#9ca3af"></div></div>
+  <div class="realm" style="border-color:#60a5fa44"><div class="glyph" style="color:#60a5fa">氣</div><div class="num">Realm 1</div><div class="name" style="color:#60a5fa">Qi Condensation</div><div class="bar" style="background:#60a5fa"></div></div>
+  <div class="realm" style="border-color:#fbbf2444"><div class="glyph" style="color:#fbbf24">築</div><div class="num">Realm 2</div><div class="name" style="color:#fbbf24">Foundation</div><div class="bar" style="background:#fbbf24"></div></div>
+  <div class="realm" style="border-color:#a855f744"><div class="glyph" style="color:#a855f7">核</div><div class="num">Realm 3</div><div class="name" style="color:#a855f7">Core Formation</div><div class="bar" style="background:#a855f7"></div></div>
+  <div class="realm" style="border-color:#2dd4bf44"><div class="glyph" style="color:#2dd4bf">嬰</div><div class="num">Realm 4</div><div class="name" style="color:#2dd4bf">Nascent Soul</div><div class="bar" style="background:#2dd4bf"></div></div>
+  <div class="realm" style="border-color:#3b82f644"><div class="glyph" style="color:#3b82f6">化</div><div class="num">Realm 5</div><div class="name" style="color:#3b82f6">Soul Transform.</div><div class="bar" style="background:#3b82f6"></div></div>
+  <div class="realm" style="border-color:#8b5cf644"><div class="glyph" style="color:#8b5cf6">虛</div><div class="num">Realm 6</div><div class="name" style="color:#8b5cf6">Void Refinement</div><div class="bar" style="background:#8b5cf6"></div></div>
+  <div class="realm" style="border-color:#f59e0b44"><div class="glyph" style="color:#f59e0b">合</div><div class="num">Realm 7</div><div class="name" style="color:#f59e0b">Body Integration</div><div class="bar" style="background:#f59e0b"></div></div>
+  <div class="realm" style="border-color:#38bdf844"><div class="glyph" style="color:#38bdf8">大</div><div class="num">Realm 8</div><div class="name" style="color:#38bdf8">Mahayana</div><div class="bar" style="background:#38bdf8"></div></div>
+  <div class="realm" style="border-color:#eab30844"><div class="glyph" style="color:#eab308">渡</div><div class="num">Realm 9</div><div class="name" style="color:#eab308">Tribulation</div><div class="bar" style="background:#eab308"></div></div>
+  <div class="realm" style="border-color:#f472b644;background:linear-gradient(180deg,rgba(244,114,182,.08),rgba(13,20,34,.8))"><div class="glyph" style="color:#f472b6">仙</div><div class="num">Realm 10</div><div class="name" style="color:#f472b6">True Immortal</div><div class="bar" style="background:linear-gradient(90deg,#f472b6,#f5c97a)"></div></div>
+</div>
+</body></html>

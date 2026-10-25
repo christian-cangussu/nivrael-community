@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Noto+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#06080f;font-family:'Noto Sans',sans-serif;padding:20px 24px;color:#e2eaff;display:flex;flex-wrap:wrap;gap:10px;align-items:flex-start}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 16px;border-radius:10px;border:1px solid #1e3060;background:linear-gradient(180deg,rgba(40,60,110,.6),rgba(20,32,60,.85));color:#e2eaff;font-family:'Cinzel',serif;font-size:12px;font-weight:600;letter-spacing:.5px;cursor:pointer}
+.btn.primary{border-color:#c9903a;background:linear-gradient(180deg,rgba(201,144,58,.3),rgba(120,80,30,.5));color:#f5c97a}
+.btn.jade{border-color:#3ecf7e;background:linear-gradient(180deg,rgba(62,207,126,.2),rgba(20,80,45,.5));color:#3ecf7e}
+.btn.ghost{border-color:#253f7a;background:rgba(0,0,0,.25);color:#6e89bf}
+.btn.danger{border-color:#e5534b;background:rgba(229,83,75,.15);color:#e5534b}
+.btn.sm{padding:6px 12px;font-size:10px;border-radius:8px}
+.btn.lg{padding:12px 24px;font-size:14px;border-radius:12px}
+.group{display:flex;gap:8px;align-items:center;flex-wrap:wrap;width:100%;padding:8px 0;border-bottom:1px solid rgba(60,90,180,.12)}
+.group:last-child{border-bottom:none}
+.label{font-size:10px;color:#3d5a9e;letter-spacing:.5px;text-transform:uppercase;width:80px;flex-shrink:0;font-family:'Cinzel',serif}
+</style></head>
+<body>
+  <div class="group"><div class="label">Default</div><button class="btn">Cultivar</button><button class="btn">Ver Seita</button><button class="btn">Atacar Boss</button></div>
+  <div class="group"><div class="label">Primary</div><button class="btn primary">✦ Meditar</button><button class="btn primary">Forjar Artefacto</button></div>
+  <div class="group"><div class="label">Jade</div><button class="btn jade">Reclamar Recompensa</button><button class="btn jade">✓ Completo</button></div>
+  <div class="group"><div class="label">Ghost</div><button class="btn ghost">Cancelar</button><button class="btn ghost">Ver Mais</button></div>
+  <div class="group"><div class="label">Danger</div><button class="btn danger">Abandonar Seita</button></div>
+  <div class="group"><div class="label">Sizes</div><button class="btn primary sm">Forjar</button><button class="btn primary">Meditar Fundo</button><button class="btn primary lg">Iniciar Tribulação</button></div>
+</body></html>

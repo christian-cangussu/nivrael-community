@@ -1,0 +1,31 @@
+-- Migration 122 — Sprint 1: Raça (KEYSTONE A, o 3º eixo de nascença)
+-- races_and_cosmic_scale.md §KEYSTONE A (travada 2026-06-29). ADDITIVE + WIPE-SAFE.
+--
+-- Adds the THIRD birth axis, ORTHOGONAL to the two that already exist:
+--   * spirit_root   — QUALITY/purity (0=Heavenly..4=Low): HOW FAST you cultivate.
+--   * root_elements — Wuxing COMPOSITION: WHAT you can comprehend (migration 120).
+--   * race (NEW)    — the PEOPLE the soul was born into (fate, D-EG-3). One of
+--                     6 language-neutral keys (humano/celeste/primordial/tita/
+--                     demonio/draconato), derived deterministically per telegram_id
+--                     in core.race_engine. VARCHAR(16) holds every key with room.
+--
+-- DISCLOSURE-ONLY this wave: NOTHING in combat/cultivation/alchemy/travel reads
+-- `race` (defensive grep enforced in core.race_engine). The mechanical depth —
+-- techniques-by-origin (KEYSTONE C), rock-paper-scissors continent access
+-- (KEYSTONE B), reroll-ritual, karma-locked demon — is Track B (wipe-bound).
+--
+-- ⚠️ REGRA DE FERRO DOS 57 (Lei §1): unlike root_elements (migration 120, which
+-- backfills every NULL row), race is NEVER auto-assigned to an existing player.
+-- DEFAULT NULL and NO Python backfill: the 57 beta players on `main` stay race
+-- NULL forever. The ONLY write happens at the BIRTH of a NEW character in a world
+-- where the `racas` feature flag is ON (= mini-app world/start on a secondary
+-- world such as s2). `main` keeps the flag OFF (defaults are ironclad) AND refuses
+-- world/start → double blindage. A still-NULL row in an ON world derives a race
+-- for DISPLAY only (never persisted), exactly as root_elements does in its display
+-- fallback; and the panel is gated by the Surface Manifest, so `main` never renders
+-- it. Backwards-compatible: DEFAULT NULL so all 57+ beta players land neutral.
+--
+-- IMPORTANT: comments here are FULL-LINE only. An inline "--" comment containing a
+-- stray ";" would split a statement mid-flight (see migration 108 prod crash).
+
+ALTER TABLE players ADD COLUMN IF NOT EXISTS race VARCHAR(16) DEFAULT NULL;

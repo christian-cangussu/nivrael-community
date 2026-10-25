@@ -1,0 +1,59 @@
+name: Bug
+description: Something in the game, or in the code, does not work as it should.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time. **A security problem is never a public issue** — read SECURITY.md and report it privately.
+        Search the open issues first: if yours is already there, add what you saw to it.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you saw, and what you expected to see instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: How to reproduce it
+      description: The smallest steps that show it — from a fresh `docker compose up` or `python -m community.local` if you can.
+      placeholder: |
+        1. Sign in through the local gate
+        2. Open …
+        3. …
+    validations:
+      required: true
+  - type: dropdown
+    id: where
+    attributes:
+      label: Where it happens
+      options:
+        - the browser client — phone layout
+        - the browser client — desktop layout
+        - the Telegram Mini App
+        - the Telegram chat
+        - installing or running the edition
+        - the code or the tests
+    validations:
+      required: true
+  - type: dropdown
+    id: language
+    attributes:
+      label: The game's language when it happened
+      options:
+        - Português (Brasil)
+        - English
+        - Español
+        - it does not depend on the language
+  - type: input
+    id: version
+    attributes:
+      label: Commit
+      description: The output of `git rev-parse --short HEAD`, if you run it yourself.
+  - type: textarea
+    id: extra
+    attributes:
+      label: Screenshots or logs
+      description: Never paste a token, a password, or anyone's personal data.

@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+
+# A porta e o cliente do jogo nao tem nada para indexar — e `/app` e `/miniapp`
+# so respondem a quem tem sessao. Mante-los fora do rastreio poupa orcamento de
+# rastreio para as paginas que devem posicionar.
+Disallow: /login
+Disallow: /app
+Disallow: /miniapp
+Disallow: /api/
+
+Sitemap: https://nivrael.com/sitemap.xml

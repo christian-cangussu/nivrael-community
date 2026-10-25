@@ -1,0 +1,32 @@
+name: Idea
+description: A mechanic, a system, or a change to how the game feels.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Ideas are welcome. The house asks three questions of each one (CONTRIBUTING.md): does it sound like Wuxia — *Reverend Insanity*, not *World of Warcraft*? Does it add depth rather than variety? Is the player never left stuck without a path?
+        A big change starts here, as an issue, before any code.
+  - type: textarea
+    id: story
+    attributes:
+      label: The story it tells
+      description: What a cultivator lives through with this — not only the numbers.
+    validations:
+      required: true
+  - type: textarea
+    id: how
+    attributes:
+      label: How it would work
+      description: The rules, as you imagine them.
+    validations:
+      required: true
+  - type: textarea
+    id: where
+    attributes:
+      label: Where it would appear
+      description: Which systems and screens it touches (see `docs/systems/`). Count the places — every one of them has to work.
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: What else you considered

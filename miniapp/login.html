@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<!--
+  WEB-B Fase 2 — 山門 A PORTA.
+
+  ⚠️ O WIDGET DO TELEGRAM NÃO ESTÁ AQUI: o endpoint antigo
+  (oauth.telegram.org/auth?...&embed=1) foi APOSENTADO e devolve literalmente
+  `deprecated`. A documentação oficial arquivou-o. Um botão que só sabe falhar
+  não é um caminho.
+
+  ZERO COPY AQUI DENTRO. Toda a string visível vem do servidor já traduzida
+  (`serve_web_login` injecta o JSON) — o mesmo contrato da vitrine.
+
+  ⚠️ ANTI-ENUMERAÇÃO: o Firebase distingue "e-mail não existe" de "senha
+  errada". Nós NÃO repassamos essa diferença. Ver `mapErr()`; é uma decisão.
+
+  DESENHO (2026-09-16): a porta abre sobre Linghe, com a paisagem e os materiais
+  de portal-v1. Tinta e papel, selo de cinábrio, título Cormorant e rótulos
+  Cinzel. O formulário continua sem moldura; o mundo ocupa o horizonte.
+-->
+<html lang="{{LANG}}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#0b0a0c">
+  <title>{{TITLE}}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Cinzel:wght@400;500&family=Noto+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* A porta abre sobre Linghe: a mesma paisagem e os mesmos materiais da previa. */
+    :root {
+      --ink: #0b0a0c;
+      --paper: #ece5d8;
+      --gold: #c9903a;
+      --seal: #c8442f;
+      --muted: #baad97;
+      --line: rgba(236,229,216,.17);
+      --serif: 'Cormorant Garamond', Georgia, serif;
+      --body: 'Noto Sans', system-ui, sans-serif;
+      --label: 'Cinzel', Georgia, serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { -webkit-text-size-adjust: 100%; background: var(--ink); color-scheme: dark; }
+    body {
+      min-height: 100svh; background: var(--ink); color: var(--paper);
+      font: 14px/1.65 var(--body); -webkit-font-smoothing: antialiased;
+      isolation: isolate;
+    }
+    ::selection { color: var(--ink); background: var(--gold); }
+
+    /* A arte e' decorativa; a tinta guarda o contraste de todo o formulario. */
+    body::before, body::after {
+      content: ""; position: fixed; inset: 0; pointer-events: none; z-index: -1;
+    }
+    body::before {
+      left: 21%;
+      background: url('/miniapp/assets/isle-linghe-scene.webp') 58% center / cover no-repeat;
+      filter: saturate(.7) brightness(.82);
+    }
+    body::after {
+      background:
+        linear-gradient(90deg, var(--ink) 9%, rgba(11,10,12,.95) 30%, rgba(11,10,12,.70) 47%, rgba(11,10,12,.12) 76%),
+        linear-gradient(0deg, var(--ink), transparent 32%, transparent 76%, rgba(11,10,12,.35));
+    }
+    .gate {
+      position: relative; min-height: 100svh; max-width: 1440px; margin: 0 auto;
+      padding: 42px clamp(28px, 6vw, 88px) 48px;
+      display: grid; grid-template-columns: 56px minmax(0, 460px); gap: 18px;
+      align-content: start;
+    }
+    .seal-rail { position: relative; display: flex; justify-content: flex-start; padding-top: 113px; }
+    .seal {
+      writing-mode: vertical-rl; align-self: start;
+      font: 500 15px/1.6 var(--body); letter-spacing: .34em;
+      color: var(--paper); background: var(--seal); padding: 13px 7px 16px;
+      border-radius: 0;
+    }
+    .seal-rail::after {
+      content: ""; position: absolute; top: 254px; bottom: 8px; left: 19px; width: 1px;
+      background: linear-gradient(180deg, var(--line), transparent 82%);
+    }
+    .body { min-width: 0; }
+    .masthead {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 10px 20px; margin-bottom: 46px;
+    }
+    .eyebrow { font: 500 25px/1.4 var(--serif); letter-spacing: .22em; color: var(--paper); }
+    .langbar { display: flex; align-items: center; flex-wrap: wrap; gap: 2px; }
+    .langbar a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 8px;
+      font-size: 11px; color: var(--muted); text-decoration: none;
+      border-bottom: 1px solid transparent; white-space: nowrap;
+      transition: color .18s, border-color .18s;
+    }
+    .langbar a:hover { color: var(--paper); border-color: var(--line); }
+    .langbar a[aria-current="true"] { color: var(--paper); border-color: var(--gold); cursor: default; }
+    h1 {
+      font: 400 clamp(60px, 5.8vw, 82px)/.98 var(--serif);
+      letter-spacing: -.045em; margin-bottom: 18px; text-wrap: balance;
+      overflow-wrap: break-word;
+    }
+    .sub { font: italic 400 23px/1.4 var(--serif); color: var(--muted); margin-bottom: 20px; }
+    .hint { font-size: 13px; line-height: 1.85; color: var(--muted); max-width: 370px; margin-bottom: 27px; }
+    button, input { font: inherit; }
+    button { cursor: pointer; color: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    :is(button, a, input):focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; }
+    .prov {
+      width: 100%; min-height: 54px; margin-bottom: 9px; padding: 13px 20px;
+      display: flex; align-items: center; gap: 14px; text-align: left;
+      border: 1px solid var(--line); border-radius: 0;
+      background: rgba(11,10,12,.68); font-size: 13px; font-weight: 500;
+      transition: border-color .18s, background .18s;
+    }
+    .prov:hover:not(:disabled) { border-color: var(--gold); background: rgba(201,144,58,.08); }
+    .prov:disabled, .primary:disabled { opacity: .5; cursor: default; }
+    .prov svg { width: 19px; height: 19px; flex: none; }
+    .prov span { flex: 1; }
+    .prov .go { flex: none; font-size: 20px; font-weight: 400; color: var(--muted); }
+    .rule {
+      display: flex; align-items: center; gap: 16px; margin: 22px 0;
+      color: var(--muted); font: 10px/1.7 var(--label); letter-spacing: .2em;
+    }
+    .rule::before, .rule::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+    label { display: block; font: 10px/1.7 var(--label); letter-spacing: .16em; color: var(--muted); margin-bottom: 4px; }
+    input {
+      display: block; width: 100%; min-height: 50px; padding: 12px 0; margin-bottom: 20px;
+      border: 0; border-bottom: 1px solid rgba(236,229,216,.36); border-radius: 0;
+      background: rgba(11,10,12,.35); color: var(--paper); font-size: 16px;
+      transition: border-color .18s, background .18s;
+    }
+    input::placeholder { color: var(--muted); }
+    input:focus { border-bottom-color: var(--gold); background: rgba(11,10,12,.68); }
+    input:autofill { box-shadow: 0 0 0 100px var(--ink) inset; -webkit-text-fill-color: var(--paper); }
+    .primary {
+      display: flex; align-items: center; justify-content: space-between; gap: 20px;
+      width: 100%; min-height: 54px; padding: 13px 22px;
+      border: 1px solid var(--paper); border-radius: 0;
+      background: var(--paper); color: var(--ink); font-size: 13px; font-weight: 500;
+      transition: background .18s, border-color .18s;
+    }
+    .primary::after { content: "\2192"; font: 24px/1 var(--serif); }
+    .primary:hover:not(:disabled) { background: var(--muted); border-color: var(--muted); }
+    .links { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0 16px; margin-top: 9px; }
+    .link {
+      min-height: 44px; background: none; border: 0; padding: 10px 0;
+      color: var(--muted); font-size: 12px; text-align: left;
+      text-decoration: underline; text-decoration-color: transparent; text-underline-offset: 4px;
+      transition: color .18s, text-decoration-color .18s;
+    }
+    .link:hover { color: var(--paper); text-decoration-color: var(--gold); }
+    .status { font-size: 13px; line-height: 1.65; margin-top: 12px; min-height: 22px; padding-left: 12px; border-left: 2px solid transparent; }
+    .status.err { color: var(--paper); border-left-color: var(--seal); }
+    .status.ok { color: var(--paper); border-left-color: var(--gold); }
+    footer { margin-top: 22px; padding-top: 17px; border-top: 1px solid var(--line); }
+    .view-world {
+      display: inline-flex; align-items: center; gap: 25px; min-height: 44px;
+      color: var(--paper); font: 400 22px/1.4 var(--serif); text-decoration: none;
+      margin-bottom: 12px; transition: color .18s;
+    }
+    .view-world::after { content: "\2192"; }
+    .view-world:hover { color: var(--gold); }
+    .legacy { font-size: 12px; line-height: 1.8; color: var(--muted); margin-bottom: 14px; }
+    .legacy strong { color: var(--paper); font-weight: 500; }
+    .legacy a, .legal a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+    .legacy a:hover, .legal a:hover { color: var(--paper); }
+    .legal { font-size: 11px; line-height: 1.85; color: var(--muted); }
+    [hidden] { display: none !important; }
+
+    /* Um unico gesto de chegada; nada se move enquanto se escreve. */
+    @keyframes arrive { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+    .body > :first-child, .seal { animation: arrive .6s ease-out both; }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+    }
+    @media (max-width: 1000px) {
+      body::before { left: 12%; }
+      body::after { background: linear-gradient(90deg, rgba(11,10,12,.97), rgba(11,10,12,.82) 46%, rgba(11,10,12,.35)), linear-gradient(0deg, var(--ink), transparent 60%); }
+      .gate { grid-template-columns: 40px minmax(0, 440px); gap: 14px; }
+      .seal { font-size: 13px; }
+      .seal-rail::after { left: 17px; }
+    }
+    @media (max-width: 620px) {
+      body::before { position: absolute; left: 0; bottom: auto; height: 540px; background-position: 55% 32%; }
+      body::after { position: absolute; bottom: auto; height: 560px; background: linear-gradient(0deg, var(--ink) 2%, rgba(11,10,12,.55) 70%, rgba(11,10,12,.76)); }
+      .gate { display: block; padding: 24px 24px calc(32px + env(safe-area-inset-bottom)); max-width: 510px; }
+      .seal-rail { position: absolute; right: 24px; top: 121px; padding: 0; opacity: .82; }
+      .seal-rail::after { display: none; }
+      .seal { font-size: 11px; padding: 9px 4px 11px; }
+      .masthead { margin-bottom: 36px; gap: 4px 16px; }
+      .eyebrow { font-size: 23px; }
+      .langbar { margin-left: -8px; }
+      .langbar a { font-size: 11px; }
+      h1 { font-size: clamp(54px, 13vw, 70px); max-width: calc(100% - 30px); margin-bottom: 15px; }
+      .sub { font-size: 21px; margin-bottom: 17px; }
+      .hint { margin-bottom: 24px; }
+      .prov { background: rgba(11,10,12,.78); }
+      input { background: rgba(11,10,12,.76); }
+      .view-world { font-size: 21px; }
+    }
+    @media (max-width: 360px) {
+      .gate { padding-inline: 20px; }
+      .seal-rail { right: 20px; top: 125px; }
+      .masthead { gap: 0; }
+      .langbar { flex-basis: 100%; }
+      .links { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <div class="gate">
+    <div class="seal-rail">
+      <!-- 入道之門 — "o portão da entrada no Dao". aria-hidden porque é
+           decorativo: o h1 logo abaixo já diz o que esta página é. -->
+      <div class="seal" aria-hidden="true" lang="zh">入道之門</div>
+    </div>
+
+    <div class="body">
+      <div>
+        <div class="masthead">
+          <p class="eyebrow">NIVRAEL</p>
+          <!-- Preenchido pelo servidor, como todo o resto desta página: zero
+               copy no HTML. (Sem o token aqui de propósito — `str.replace`
+               substitui TODAS as ocorrências, e um comentário não precisa de
+               levar o JSON inteiro para dentro de cada resposta.) -->
+          <nav class="langbar" id="langbar" aria-label="Language"></nav>
+        </div>
+        <h1 id="s-title"></h1>
+        <p class="sub" id="s-sub"></p>
+      </div>
+
+      <p class="hint" id="s-hint"></p>
+
+      <div>
+        <button class="prov" id="btn-google" type="button" disabled>
+          <svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#4285F4" d="M45.1 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h11.8c-.5 2.7-2 5-4.4 6.6v5.5h7.1c4.1-3.8 6.6-9.4 6.6-16.1z"/><path fill="#34A853" d="M24 46c6 0 11-2 14.6-5.4l-7.1-5.5c-2 1.3-4.5 2.1-7.5 2.1-5.8 0-10.7-3.9-12.4-9.75H4.2v5.7C7.8 40.9 15.3 46 24 46z"/><path fill="#FBBC05" d="M11.6 27.45c-.45-1.3-.7-2.7-.7-4.15s.25-2.85.7-4.15V13.4H4.2A22 22 0 0 0 2 23.3c0 3.55.85 6.9 2.2 9.9l7.4-5.75z"/><path fill="#EA4335" d="M24 10.4c3.3 0 6.2 1.15 8.5 3.35l6.3-6.3C34.95 3.9 30 2 24 2 15.3 2 7.8 7.1 4.2 13.4l7.4 5.75C13.3 14.3 18.2 10.4 24 10.4z"/></svg>
+          <span id="s-google"></span>
+          <span class="go" aria-hidden="true">&#8594;</span>
+        </button>
+
+        <button class="prov" id="btn-apple" type="button" disabled>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16.36 12.78c.02-2.4 1.96-3.55 2.05-3.6-1.12-1.64-2.86-1.86-3.48-1.89-1.48-.15-2.89.87-3.64.87-.75 0-1.91-.85-3.14-.83-1.61.02-3.1.94-3.93 2.38-1.68 2.91-.43 7.22 1.2 9.58.8 1.16 1.75 2.46 3 2.41 1.21-.05 1.67-.78 3.13-.78 1.46 0 1.87.78 3.14.76 1.3-.02 2.12-1.18 2.91-2.34.92-1.34 1.3-2.64 1.32-2.71-.03-.01-2.53-.97-2.56-3.85zM14.0 5.6c.66-.81 1.11-1.93.99-3.05-.95.04-2.11.64-2.8 1.44-.61.71-1.15 1.85-1.01 2.94 1.06.08 2.15-.54 2.82-1.33z"/></svg>
+          <span id="s-apple"></span>
+          <span class="go" aria-hidden="true">&#8594;</span>
+        </button>
+      </div>
+
+      <div class="rule"><span id="s-or"></span></div>
+
+      <div>
+        <form id="form" autocomplete="on" novalidate>
+          <label for="email" id="s-email-label"></label>
+          <input id="email" type="email" name="email" autocomplete="email"
+                 inputmode="email" autocapitalize="none" spellcheck="false" required>
+          <label for="password" id="s-password-label"></label>
+          <input id="password" type="password" name="password"
+                 autocomplete="current-password" required minlength="6">
+          <button class="primary" id="btn-submit" type="submit" disabled></button>
+        </form>
+
+        <div class="links">
+          <button class="link" id="btn-toggle" type="button"></button>
+          <button class="link" id="btn-forgot" type="button"></button>
+        </div>
+
+        <p class="status" id="status" role="status" aria-live="polite"></p>
+      </div>
+
+      <footer>
+        <a class="view-world" id="s-view-world" href="/play"></a>
+        <p class="legacy">
+          <strong id="s-fb-title"></strong>
+          <span id="s-fb-body"></span>
+          <a id="s-open-bot" href="#" rel="noopener"></a>
+        </p>
+        <p class="legal">
+          <span id="s-legal"></span>
+          <a href="/terms" id="s-terms"></a> &middot; <a href="/privacy" id="s-privacy"></a>
+        </p>
+      </footer>
+    </div>
+  </div>
+
+  <script>
+    // Injectado pelo servidor. Nenhuma string nasce nesta página.
+    window.__S = {{STRINGS}};
+    window.__BOT = {{BOT}};
+    window.__FB = {{FIREBASE}};
+    window.__LANGS = {{LANGS}};
+  </script>
+  <script type="module">
+    var S = window.__S, BOT = window.__BOT, FB = window.__FB;
+    var L = window.__LANGS || { current: "", links: {}, labels: {} };
+
+    // ── 門 2026-09-15 — QUAIS PORTAS ESTAO ABERTAS, num sitio so' ─────────
+    //
+    // O owner desligou o Apple no Firebase ("SO GOOGLE MSM"). Um botao que o
+    // Firebase recusa nao e' um botao: e' um beco (Lei §1). Mas apaga-lo a
+    // mao deixaria o marcador em QUATRO sitios — o HTML, o `setBusy`, o
+    // `addEventListener` e a string i18n — e o proximo a religar teria de
+    // acertar os quatro. Uma tabela, e cada sitio pergunta-lhe.
+    //
+    // ⚠️ MEDIDO antes de desligar (`tools/db_readonly_apple_0915.py`, control
+    // db): Telegram 254 pessoas · Google 4 · e-mail 1 · **Apple 0**. Ninguem
+    // fica trancado. Se algum dia houver quem so' tenha Apple, a porta nao se
+    // fecha sem lhe dar outra primeiro.
+    var PORTAS = { google: true, apple: false, email: true };
+
+    // As portas fechadas saem do ecra — nao ficam cinzentas. Um botao
+    // desactivado ainda promete uma coisa que nao acontece.
+    Object.keys(PORTAS).forEach(function (k) {
+      if (PORTAS[k]) return;
+      var el = document.getElementById("btn-" + k);
+      if (el) el.remove();
+    });
+
+
+    // ── O seletor de língua ────────────────────────────────────────────────
+    // ⚠️ Isto é a Lei §1 na porta de entrada. Antes de 2026-09-04 a página
+    // aceitava `?lang=` no servidor e não desenhava saída nenhuma: quem
+    // caísse na língua errada (o browser do owner pedia `es`) ficava preso
+    // na entrada do jogo sem forma de sair. A detecção estava certa; faltava
+    // isto.
+    (function () {
+      var bar = document.getElementById("langbar");
+      if (!bar) return;
+      ["pt", "en", "es"].forEach(function (code) {
+        var href = (L.links || {})[code];
+        if (!href) return;
+        var a = document.createElement("a");
+        a.textContent = (L.labels || {})[code] || code;
+        a.setAttribute("lang", code);
+        if (code === L.current) {
+          // A actual não é um link para lado nenhum: clicá-la seria um
+          // recarregamento mudo. Fica marcada e inerte, mas continua no
+          // fluxo do leitor de ecrã a dizer qual é a língua de agora.
+          a.setAttribute("aria-current", "true");
+        } else {
+          a.href = href;
+        }
+        bar.appendChild(a);
+      });
+    })();
+
+    function put(id, key) {
+      var el = document.getElementById(id);
+      if (el) el.textContent = S[key] || "";
+    }
+    put("s-title", "web_login_title");
+    put("s-sub", "web_login_sub");
+    put("s-hint", "web_login_hint");
+    put("s-google", "web_login_google");
+    if (PORTAS.apple) put("s-apple", "web_login_apple");
+    put("s-or", "web_login_or");
+    put("s-email-label", "web_login_email_label");
+    put("s-password-label", "web_login_password_label");
+    put("s-fb-title", "web_login_fallback_title");
+    put("s-fb-body", "web_login_fallback_body");
+    put("s-open-bot", "web_login_open_bot");
+    put("s-view-world", "web_login_view_world");
+    put("s-legal", "web_login_legal");
+    put("s-terms", "web_login_terms");
+    put("s-privacy", "web_login_privacy");
+    document.getElementById("s-open-bot").href = "https://t.me/" + BOT;
+
+    var statusEl = document.getElementById("status");
+    function say(key, kind) {
+      statusEl.className = "status" + (kind ? " " + kind : "");
+      statusEl.textContent = S[key] || "";
+    }
+
+    // ⚠️ Redirecção só para DENTRO deste site. Aceitar `next` sem o validar
+    // seria um open redirect — a porta de entrada é exactamente o sítio onde
+    // isso mais dói (um link "nivrael.com/login?next=..." parece de casa).
+    //
+    // ⚠️ E não basta olhar para os dois primeiros caracteres: os browsers
+    // RETIRAM tab/CR/LF ao interpretar um URL, portanto `/<TAB>//evil.com`
+    // passaria num teste ingénuo e navegaria para `///evil.com` — que é
+    // protocol-relative, ou seja, outro site. Limpar ANTES de validar.
+    function safeNext() {
+      try {
+        var raw = new URLSearchParams(window.location.search).get("next") || "";
+        raw = raw.replace(/[\u0000-\u001F\u007F\s]/g, "");
+        if (raw.charAt(0) === "/" && raw.charAt(1) !== "/" &&
+            raw.indexOf("\\") < 0 && raw.indexOf(":") < 0) return raw;
+      } catch (e) {}
+      return "/app";
+    }
+
+    // ── O modo do formulário: entrar vs criar conta ─────────────────────────
+    var mode = "in";
+    function renderMode() {
+      document.getElementById("btn-submit").textContent =
+        S[mode === "in" ? "web_login_submit_in" : "web_login_submit_up"] || "";
+      document.getElementById("btn-toggle").textContent =
+        S[mode === "in" ? "web_login_toggle_up" : "web_login_toggle_in"] || "";
+      document.getElementById("password").setAttribute(
+        "autocomplete", mode === "in" ? "current-password" : "new-password");
+      document.getElementById("btn-forgot").hidden = (mode !== "in");
+    }
+    document.getElementById("btn-forgot").textContent = S["web_login_forgot"] || "";
+    renderMode();
+    document.getElementById("btn-toggle").addEventListener("click", function () {
+      mode = (mode === "in") ? "up" : "in";
+      say("", "");
+      renderMode();
+      document.getElementById("email").focus();
+    });
+
+    // ⚠️ ANTI-ENUMERAÇÃO. O Firebase devolve códigos que dizem se o e-mail
+    // existe (`user-not-found`) ou se só a senha está errada (`wrong-password`).
+    // Repassar isso transformava esta página num verificador de e-mails para
+    // qualquer pessoa. As duas — e a `invalid-credential` moderna — dão a MESMA
+    // frase. É por isso que estão na mesma linha.
+    function mapErr(code) {
+      switch (code) {
+        case "auth/user-not-found":
+        case "auth/wrong-password":
+        case "auth/invalid-credential":
+        case "auth/invalid-email":
+          return "web_login_err_email";
+        case "auth/weak-password":              return "web_login_err_weak";
+        case "auth/email-already-in-use":       return "web_login_err_exists";
+        case "auth/too-many-requests":          return "web_login_err_toomany";
+        case "auth/popup-blocked":
+        case "auth/popup-closed-by-user":
+        case "auth/cancelled-popup-request":    return "web_login_err_popup";
+        case "auth/network-request-failed":     return "web_login_error_network";
+        case "auth/operation-not-allowed":      return "web_login_error_server";
+        default:                                return "web_login_error_server";
+      }
+    }
+
+    function setBusy(on) {
+      ["btn-google", "btn-apple", "btn-submit"].forEach(function (id) {
+        var el = document.getElementById(id);
+        if (el) el.disabled = on;   // uma porta fechada ja' nao esta' no DOM
+      });
+    }
+
+    try {
+      var appMod = await import("https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js");
+      var authMod = await import("https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js");
+      var app = appMod.initializeApp(FB);
+      var auth = authMod.getAuth(app);
+      auth.useDeviceLanguage();
+      setBusy(false);
+
+      // ── Troca o ID token do Firebase pela NOSSA sessão ────────────────────
+      // ⚠️ A sessão do Firebase nunca é a sessão do jogo: o ID token vale uma
+      // hora e não é revogável por nós. Depois desta troca fazemos `signOut`
+      // local — a verdade passa a ser o nosso cookie, que É revogável.
+      async function exchange(cred) {
+        var idToken = await cred.user.getIdToken();
+        var r = await fetch("/api/auth/firebase", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ id_token: idToken }),
+        });
+        var j = await r.json().catch(function () { return { ok: false, reason: "server_error" }; });
+        try { await authMod.signOut(auth); } catch (e) {}
+        if (j && j.ok) { window.location.replace(safeNext()); return; }
+        var reason = (j && j.reason) || "server_error";
+        say(reason === "login_invalid" || reason === "token_expired"
+              ? "web_login_error_invalid" : "web_login_error_server", "err");
+        setBusy(false);
+      }
+
+      async function viaProvider(provider) {
+        say("web_login_working", "ok");
+        setBusy(true);
+        try {
+          await exchange(await authMod.signInWithPopup(auth, provider));
+        } catch (e) {
+          say(mapErr(e && e.code), "err");
+          setBusy(false);
+        }
+      }
+
+      document.getElementById("btn-google").addEventListener("click", function () {
+        viaProvider(new authMod.GoogleAuthProvider());
+      });
+      if (PORTAS.apple) {
+        document.getElementById("btn-apple").addEventListener("click", function () {
+          var p = new authMod.OAuthProvider("apple.com");
+          p.addScope("email"); p.addScope("name");
+          viaProvider(p);
+        });
+      }
+
+      document.getElementById("form").addEventListener("submit", async function (ev) {
+        ev.preventDefault();
+        var email = document.getElementById("email").value.trim();
+        var pass = document.getElementById("password").value;
+        if (!email || !pass) { say("web_login_err_email", "err"); return; }
+        say("web_login_working", "ok");
+        setBusy(true);
+        try {
+          var cred = (mode === "in")
+            ? await authMod.signInWithEmailAndPassword(auth, email, pass)
+            : await authMod.createUserWithEmailAndPassword(auth, email, pass);
+          if (mode === "up") {
+            // Best-effort: falhar a mandar o e-mail de confirmação não pode
+            // impedir a pessoa de jogar (Lei §1 — ela acabou de criar a conta).
+            try { await authMod.sendEmailVerification(cred.user); } catch (e) {}
+          }
+          await exchange(cred);
+        } catch (e) {
+          say(mapErr(e && e.code), "err");
+          setBusy(false);
+        }
+      });
+
+      document.getElementById("btn-forgot").addEventListener("click", async function () {
+        var email = document.getElementById("email").value.trim();
+        if (!email) { say("web_login_err_email", "err"); return; }
+        setBusy(true);
+        try { await authMod.sendPasswordResetEmail(auth, email); } catch (e) {}
+        // ⚠️ SEMPRE a mesma resposta, tenha o e-mail conta ou não — e por isso
+        // o `catch` está vazio de propósito. Dizer "esse e-mail não existe"
+        // seria o mesmo vazamento que o `mapErr` fecha na entrada.
+        say("web_login_reset_sent", "ok");
+        setBusy(false);
+      });
+    } catch (e) {
+      // O SDK não carregou (bloqueador, rede fechada, CDN em baixo). Ver o
+      // mundo e entrar pelo bot continuam visíveis — a página nunca fica sem
+      // caminho.
+      say("web_login_err_sdk", "err");
+    }
+  </script>
+</body>
+</html>

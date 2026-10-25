@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Noto+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#06080f;font-family:'Noto Sans',sans-serif;padding:16px 20px;color:#e2eaff;display:flex;flex-wrap:wrap;gap:12px}
+.card{background:linear-gradient(180deg,rgba(17,29,53,.85),rgba(13,20,34,.85));border:1px solid #1e3060;border-radius:14px;padding:14px;flex:1;min-width:200px}
+.card-title{font-family:'Cinzel',serif;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:#6e89bf;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.card-title b{color:#f5c97a;font-weight:600}
+.stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.stat{background:rgba(0,0,0,.3);border:1px solid rgba(60,90,180,.18);border-radius:10px;padding:8px 10px}
+.stat-label{font-size:10px;color:#6e89bf;text-transform:uppercase;letter-spacing:.8px}
+.stat-value{font-size:15px;font-weight:600;margin-top:2px}
+.bar{width:100%;height:7px;background:rgba(255,255,255,.05);border-radius:6px;overflow:hidden;border:1px solid rgba(60,90,180,.18);margin-bottom:6px}
+.bar div{height:100%;border-radius:6px}
+.row{display:flex;align-items:center;gap:10px;padding:8px 4px;border-bottom:1px dashed rgba(60,90,180,.15)}
+.row:last-child{border-bottom:none}
+.rank-num{font-family:'Cinzel',serif;font-size:14px;font-weight:600;color:#f5c97a;width:26px;text-align:center}
+.rank-num.top1{color:#ffd700}.rank-num.top2{color:#c0c0c0}.rank-num.top3{color:#cd7f32}
+.name{flex:1;font-size:13px;font-weight:500}
+.meta{font-size:11px;color:#6e89bf;text-align:right}
+.row.you{background:linear-gradient(90deg,rgba(201,144,58,.16),transparent);border-radius:8px}
+</style></head>
+<body>
+  <!-- Stat card -->
+  <div class="card" style="max-width:220px">
+    <div class="card-title"><span>Atributos</span></div>
+    <div class="stat-grid">
+      <div class="stat"><div class="stat-label">Poder</div><div class="stat-value">2.4M</div></div>
+      <div class="stat"><div class="stat-label">Alma</div><div class="stat-value">180K</div></div>
+      <div class="stat"><div class="stat-label">Percepção</div><div class="stat-value">94K</div></div>
+      <div class="stat"><div class="stat-label">Sorte</div><div class="stat-value">12K</div></div>
+    </div>
+  </div>
+
+  <!-- Progress card -->
+  <div class="card" style="max-width:220px">
+    <div class="card-title"><span>Cultivo</span><b>72.4%</b></div>
+    <div class="bar"><div style="width:72%;background:linear-gradient(90deg,#c9903a,#f5c97a)"></div></div>
+    <div style="display:flex;justify-content:space-between;font-size:11px;color:#6e89bf;margin-bottom:10px"><span>720K / 995K</span><span>Alma Nascente</span></div>
+    <div class="card-title"><span>Qi</span><b>55%</b></div>
+    <div class="bar"><div style="width:55%;background:linear-gradient(90deg,#4cc4ff,#7be3ff)"></div></div>
+    <div style="display:flex;justify-content:space-between;font-size:11px;color:#6e89bf"><span>5.5K / 10K</span><span class="badge" style="background:rgba(62,207,126,.18);color:#3ecf7e;border:1px solid rgba(62,207,126,.35);border-radius:999px;font-size:10px;font-weight:600;padding:2px 7px">×2.5</span></div>
+  </div>
+
+  <!-- Leaderboard card -->
+  <div class="card" style="max-width:260px">
+    <div class="card-title"><span>Top Cultivadores</span><b>100</b></div>
+    <div class="row"><div class="rank-num top1">#1</div><div class="name">劍天明</div><div class="meta">仙9 · 12.4M</div></div>
+    <div class="row"><div class="rank-num top2">#2</div><div class="name">Lírio do Abismo</div><div class="meta">仙8 · 9.1M</div></div>
+    <div class="row"><div class="rank-num top3">#3</div><div class="name">Espada Imortal</div><div class="meta">大8 · 7.8M</div></div>
+    <div class="row you"><div class="rank-num">#47</div><div class="name">Tu</div><div class="meta">嬰4 · 340K</div></div>
+  </div>
+</body></html>

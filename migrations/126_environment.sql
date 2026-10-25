@@ -1,0 +1,29 @@
+-- Migration 126 — Sprint 6: Ambiental 环境, a 3ª VIA de input do Corpo
+-- Prompts/sprint6_ambiental.md (travada 2026-06-30). ADDITIVE + WIPE-SAFE.
+--
+-- Adds the THIRD input source for the Mortal-flesh band: the WORLD tempers the
+-- flesh. Permanecer/meditar em SÍTIOS de ambiente extremo (caverna de gelo, pico
+-- de vulcão, abismo de qi denso) rende mortal_temper_progress — a MESMA moeda
+-- paciente que a Horta (Sprint 4, idle) e a Caça (Sprint 5, expedições) enchem.
+-- O pacer aqui é um COOLDOWN global + estar no CONTINENTE do sítio (situacional:
+-- tempo + estar no lugar certo, SEM custo de pedras). Esse progresso desconta o qi
+-- da próxima "Temperar a Carne" pelo pipe que já existe. Temperar NUNCA dá
+-- qi/qi_capacity (BC-5). O catálogo de sítios (TEMPER_SITES) é uma constante de
+-- engine -> wipe-safe; esta migration só adiciona UM timestamp de cooldown.
+--
+-- ⚠️ REGRA DE FERRO DOS 57 (Lei §1): a coluna nova é nullable DEFAULT NULL, logo os
+-- 57 do `main` ficam em NULL = NEUTRO (nunca temperaram o ambiente -> sempre
+-- "pronto", mas o gate mantém a acção invisível). NADA lê esta coluna no `main`:
+-- `cultivo_corpo_r0` está OFF lá (o mesmo gate da acção de têmpera — sem flag
+-- nova), por isso o endpoint recusa e o api_player nunca expõe a superfície
+-- Ambiente. O ÚNICO writer é a acção env_temper gated num mundo onde
+-- `cultivo_corpo_r0` está ON E realm < 7. O combate nunca lê esta coluna -> o
+-- `main` fica byte-idêntico.
+--
+-- Per-world isolation: get_session_factory() roteia cada mundo para a SUA própria
+-- DB (contextvar current_world), por isso não precisa de coluna world_key.
+--
+-- IMPORTANTE: o runner faz split em ";". Todo comentário é FULL-LINE — um "--"
+-- inline com um ";" perdido truncaria a statement (ver o crash da migration 108).
+
+ALTER TABLE players ADD COLUMN IF NOT EXISTS env_last_temper_at TIMESTAMPTZ DEFAULT NULL;

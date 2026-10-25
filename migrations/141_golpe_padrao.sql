@@ -1,0 +1,33 @@
+-- ⚔️ O GOLPE PADRÃO — a técnica que o relógio dispara quando você não está lá
+-- (report do [jogador], 2026-09-10 09:59; decisão do owner, 2026-09-12)
+--
+-- O PEDIDO, textual: *"in Arena, give option to set 'default' technique to use
+-- (instead of default regular attack). This can give the option to advance
+-- paths without having to wait each time the 3 minutes counter (can do other
+-- things without worry)"*.
+--
+-- O QUE EXISTIA: quando a ronda esgota (15 s), `check_and_handle_timeout`
+-- preenche o lado que faltou com `technique_id: 0` — o GOLPE BÁSICO. Sempre,
+-- para toda a gente, em todas as dez famílias de duelo. Quem fechou o mini-app
+-- luta a soco.
+--
+-- O QUE ESTA COLUNA GUARDA: a técnica que esse preenchimento passa a usar,
+-- escolhida pelo jogador UMA vez (o pedido dele é precisamente não ter de
+-- escolher de cada vez).
+--
+-- ⚠️ NULL = o golpe básico = o comportamento de HOJE, byte a byte. Os 57 do
+-- `main` e todo o mundo que não ligar a flag nunca vêem diferença: a coluna
+-- nasce NULL para toda a gente e só é escrita por quem a escolher.
+--
+-- ⚠️ SEM foreign key para `techniques` DE PROPÓSITO. Uma FK obrigaria a decidir
+-- o que fazer quando uma técnica sai do catálogo, e a resposta certa aqui é a
+-- mais suave: o motor valida contra as técnicas EQUIPADAS no instante do
+-- disparo (é o que o `submit_action` já faz), portanto um id que deixou de
+-- existir simplesmente não passa na validação e cai no golpe básico. Uma FK
+-- com ON DELETE SET NULL daria o mesmo resultado com mais superfície.
+--
+-- Backwards compatible: ADD COLUMN IF NOT EXISTS, DEFAULT NULL, zero backfill,
+-- zero DROP.
+
+ALTER TABLE players
+    ADD COLUMN IF NOT EXISTS default_technique_id BIGINT DEFAULT NULL;

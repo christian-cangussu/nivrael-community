@@ -1,0 +1,23 @@
+-- Onda 4b — Travel between continents. Wires the orphan
+-- continent_engine.set_player_continent into a real player action: travel to
+-- one of the five continents for a spirit-stones cost on its own cooldown.
+-- This is the piece that makes everything Onda 3/4a built CONTROLLABLE — your
+-- plaza, your bounty hunt, the NPCs you meet, and which sects court you all
+-- follow current_continent, and now YOU choose it.
+--
+-- Everything here is ADDITIVE + WIPE-SAFE (Lei Primordial §5):
+--   * ONE new column on players (last_travel_at) — DEFAULT NULL = "never
+--     travelled". No existing value is rewritten; the 57 live players keep
+--     their current_continent (default 'linghe' from migration 100).
+--   * Travel NEVER locks any farm. current_continent only ADDS context
+--     (plaza/bounty/encounters/sect-affinity); it removes access to nothing.
+--     The per-continent content hard-gate is deferred to the WIPE (Onda 5/6).
+--   * The travel cooldown gets its OWN column — it is NEVER shared with any
+--     combat/farm cooldown (last_cultivator_fight / last_npc_fight stay intact).
+--
+-- current_continent already exists (migration 100) — NOT recreated here.
+--
+-- NB: this migration runner splits on ";". Keep every comment on its OWN full
+-- line starting with "--" (NEVER an inline comment containing a ";").
+
+ALTER TABLE players ADD COLUMN IF NOT EXISTS last_travel_at TIMESTAMPTZ;

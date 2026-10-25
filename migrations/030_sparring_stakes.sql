@@ -1,0 +1,3 @@
+-- 030_sparring_stakes.sql
+ALTER TABLE combat_log ADD COLUMN IF NOT EXISTS wager_amount BIGINT DEFAULT 0 NOT NULL;
+ALTER TABLE combat_log ADD COLUMN IF NOT EXISTS wager_winner_id BIGINT DEFAULT NULL;

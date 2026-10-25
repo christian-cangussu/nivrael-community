@@ -1,0 +1,11 @@
+# Keeps the actions of .github/workflows pinned to current commits.
+# Dependabot opens a pull request when an action has a new release; the CI of
+# that pull request proves it before anyone merges it.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: ci

@@ -1,0 +1,53 @@
+# Nivrael — community edition: PostgreSQL 17 + the game, on your machine.
+#
+#   docker compose up        →  http://localhost:8080/login
+#
+# The image is the game's own Dockerfile (it builds the website and the compiled
+# client); only the command changes: `community.local` runs the web game without
+# Telegram, creates the local world on first boot and opens the local
+# development login. This stack is for playing and developing — NOT for a public
+# server (the login has no password, and the port is bound to this machine only).
+#
+# Values from a `.env` next to this file are used when present (see .env.example).
+name: nivrael
+
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: nivrael
+      POSTGRES_PASSWORD: nivrael
+      POSTGRES_DB: nivrael
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nivrael -d nivrael"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+
+  game:
+    build: .
+    command: ["python", "-u", "-m", "community.local"]
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      # inside the stack the database is the `db` service, whatever .env says
+      DATABASE_URL: postgresql+asyncpg://nivrael:nivrael@db:5432/nivrael
+      NIVRAEL_HTTP_HOST: 0.0.0.0
+      NIVRAEL_HTTP_PORT: "8080"
+      NIVRAEL_DEV_LOGIN: ${NIVRAEL_DEV_LOGIN:-1}
+      NIVRAEL_MONETIZATION: ${NIVRAEL_MONETIZATION:-0}
+      NIVRAEL_STATE_DIR: /app/.nivrael
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - state:/app/.nivrael
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+  state:

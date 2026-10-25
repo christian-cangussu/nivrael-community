@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Nivrael — UI Kit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Noto+Sans:wght@400;500;600&family=Noto+Serif+SC:wght@500;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html,body,#root{height:100%;width:100%}
+    body{font-family:'Noto Sans',sans-serif;background:#0a0508;color:#f0e6d0;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+
+    :root {
+      --realm-0:#9ca3af;--realm-1:#60a5fa;--realm-2:#fbbf24;
+      --realm-3:#a855f7;--realm-4:#2dd4bf;--realm-5:#3b82f6;
+      --realm-6:#8b5cf6;--realm-7:#f59e0b;--realm-8:#38bdf8;
+      --realm-9:#eab308;--realm-10:#f472b6;
+      --gold:#c9903a;--gold2:#f5c97a;--gold3:#fde68a;
+      --jade:#3ecf7e;--red:#e5534b;--warn:#f59e0b;
+      /* IIT warm palette */
+      --bg-warm:#0e0908;
+      --card-warm:rgba(28,16,8,.88);
+      --card-border:rgba(180,120,40,.5);
+      --card-border-hi:rgba(220,160,60,.8);
+      --text-warm:#f0e6d0;
+      --text-dim:#b89a6a;
+      --text-muted:#7a5f3a;
+    }
+
+    @keyframes orb-breathe{0%,100%{transform:scale(1);filter:brightness(1)}50%{transform:scale(1.05);filter:brightness(1.2)}}
+    @keyframes orb-ring-out{0%{transform:scale(.85);opacity:.7}100%{transform:scale(1.6);opacity:0}}
+    @keyframes qi-rise{0%{transform:translateY(0) translateX(0) scale(1);opacity:.9}100%{transform:translateY(-100px) translateX(var(--dx,20px)) scale(0);opacity:0}}
+    @keyframes fade-up{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+    @keyframes float-glyph{0%,100%{transform:translate(0,0);opacity:.05}50%{transform:translate(8px,-15px);opacity:.1}}
+    @keyframes pulse{0%,100%{opacity:.6}50%{opacity:1}}
+    @keyframes spin-slow{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+
+    /* ── Stage ── */
+    .stage {
+      min-height:100vh;
+      display:flex; align-items:center; justify-content:center;
+      padding:24px 16px; gap:32px; flex-wrap:wrap;
+      background:
+        radial-gradient(ellipse at 20% 10%, rgba(120,60,10,.3),transparent 50%),
+        radial-gradient(ellipse at 80% 90%, rgba(40,20,80,.25),transparent 50%),
+        #0a0508;
+    }
+
+    /* ── Phone bezel ── */
+    .phone {
+      width:375px; height:720px; border-radius:38px;
+      position:relative; flex-shrink:0; overflow:hidden;
+      border:2px solid rgba(180,120,40,.6);
+      box-shadow:
+        0 0 0 1px rgba(0,0,0,.9),
+        0 0 40px rgba(180,100,20,.2),
+        0 40px 80px rgba(0,0,0,.8),
+        inset 0 0 0 1px rgba(255,200,100,.04);
+    }
+    .phone-notch{
+      position:absolute;top:10px;left:50%;transform:translateX(-50%);
+      width:80px;height:4px;background:rgba(255,255,255,.06);border-radius:2px;z-index:30;
+    }
+
+    /* ── App shell ── */
+    .app{height:100%;display:flex;flex-direction:column;position:relative;overflow:hidden}
+
+    /* Full-bleed hero art background */
+    .app-bg{
+      position:absolute;inset:0;z-index:0;
+      background-image:url('../../assets/hero-bg.webp');
+      background-size:cover; background-position:center top;
+      filter:brightness(.45) saturate(.8);
+    }
+    .app-bg-overlay{
+      position:absolute;inset:0;z-index:1;
+      background:
+        linear-gradient(180deg,rgba(8,5,3,.55) 0%,rgba(8,5,3,.2) 30%,rgba(8,5,3,.1) 55%,rgba(8,5,3,.75) 80%,rgba(8,5,3,.97) 100%);
+    }
+
+    /* Floating bg glyphs */
+    .bg-glyphs{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden;font-family:'Noto Serif SC',serif}
+    .bg-glyphs span{position:absolute;font-weight:700;color:rgba(180,120,40,.07);animation:float-glyph 18s ease-in-out infinite}
+
+    /* ── Header ── */
+    .header{
+      position:relative;z-index:10;
+      padding:18px 14px 10px;
+      display:flex;flex-direction:column;gap:8px;
+      border-bottom:1px solid rgba(180,120,40,.25);
+    }
+    .header::after{
+      content:'';position:absolute;bottom:0;left:10%;right:10%;height:1px;
+      background:linear-gradient(90deg,transparent,rgba(220,160,60,.7),transparent);
+    }
+    .header-row{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+
+    .dao-name{
+      font-family:'Cinzel',serif;font-size:16px;font-weight:700;
+      background:linear-gradient(90deg,#fde68a,#f5c97a,#c9903a);
+      -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+      letter-spacing:.5px;line-height:1.2;
+    }
+    .dao-title{font-family:'Noto Serif SC',serif;font-size:10px;color:rgba(180,130,60,.9);margin-top:2px}
+
+    .realm-badge{
+      display:flex;flex-direction:column;align-items:center;gap:0;
+      padding:5px 10px;border-radius:4px;
+      border:1px solid var(--card-border);
+      background:rgba(10,6,2,.7);
+      box-shadow:0 0 10px rgba(180,120,40,.15);
+      flex-shrink:0;
+    }
+    .realm-badge .rb-glyph{font-family:'Noto Serif SC',serif;font-size:16px;font-weight:700;line-height:1.1}
+    .realm-badge .rb-sub{font-size:8px;font-family:'Cinzel',serif;letter-spacing:.3px;margin-top:1px;white-space:nowrap}
+
+    .currencies{display:flex;gap:10px;font-size:11.5px;flex-wrap:wrap;align-items:center}
+    .curr{display:inline-flex;align-items:center;gap:3px;color:var(--text-dim)}
+    .curr b{color:#f0e6d0;font-weight:600}
+    .spirit-root{margin-left:auto;font-size:9.5px;font-family:'Cinzel',serif;color:#f5c97a;letter-spacing:.3px}
+
+    /* ── Content ── */
+    .content{position:relative;z-index:5;flex:1;overflow-y:auto;padding:10px 12px 90px;-webkit-overflow-scrolling:touch}
+    .content::-webkit-scrollbar{width:0}
+
+    /* ── Cards — parchment/jade tablet style ── */
+    .card{
+      position:relative;
+      background:linear-gradient(160deg,rgba(22,12,5,.92),rgba(14,8,3,.95));
+      border:1px solid rgba(160,100,30,.4);
+      border-radius:8px;
+      padding:12px 13px 11px;
+      margin-bottom:9px;
+      animation:fade-up .3s ease;
+      overflow:hidden;
+    }
+    /* Top gold line */
+    .card::before{
+      content:'';position:absolute;top:0;left:8%;right:8%;height:1px;
+      background:linear-gradient(90deg,transparent,rgba(220,160,60,.6),rgba(245,201,122,.9),rgba(220,160,60,.6),transparent);
+    }
+    /* Bottom faint line */
+    .card::after{
+      content:'';position:absolute;bottom:0;left:15%;right:15%;height:1px;
+      background:linear-gradient(90deg,transparent,rgba(180,120,40,.3),transparent);
+    }
+    /* Inner parchment texture */
+    .card-texture{
+      position:absolute;inset:0;opacity:.025;pointer-events:none;
+      background:repeating-linear-gradient(90deg,rgba(180,130,60,.6) 0px,transparent 1px,transparent 6px);
+    }
+    .card-inner{position:relative;z-index:1}
+
+    .card-corner{position:absolute;width:12px;height:12px;pointer-events:none;z-index:2}
+    .card-corner svg{width:100%;height:100%}
+
+    .card-title{
+      font-family:'Cinzel',serif;font-size:11px;font-weight:400;
+      letter-spacing:1.2px;text-transform:uppercase;
+      color:rgba(200,150,60,.85);
+      display:flex;justify-content:space-between;align-items:center;
+      padding-bottom:8px;margin-bottom:9px;
+      border-bottom:1px solid rgba(160,100,30,.25);
+    }
+    .card-title b{color:#f5c97a;font-weight:600}
+
+    /* ── Stat cells ── */
+    .stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
+    .stat-cell{
+      background:rgba(0,0,0,.45);border:1px solid rgba(140,90,20,.25);
+      border-radius:5px;padding:7px 9px;position:relative;overflow:hidden;
+    }
+    .stat-cell::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(200,140,40,.25),transparent)}
+    .stat-label{font-size:9.5px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.7px}
+    .stat-value{font-size:14px;font-weight:600;margin-top:3px;color:var(--text-warm)}
+
+    /* ── Progress bars ── */
+    .bar-wrap{width:100%;height:9px;background:rgba(0,0,0,.6);border-radius:5px;overflow:hidden;border:1px solid rgba(160,100,30,.3);position:relative}
+    .bar-fill{height:100%;border-radius:5px;transition:width .4s ease;position:relative}
+    .bar-fill::after{content:'';position:absolute;top:0;left:0;right:0;height:50%;background:rgba(255,255,255,.12);border-radius:4px}
+    .bar-cult .bar-fill{background:linear-gradient(90deg,#7a4810,#c9903a,#f5c97a)}
+    .bar-qi .bar-fill{background:linear-gradient(90deg,#0e3d5e,#2ea8e0,#7be3ff)}
+    .bar-hp .bar-fill{background:linear-gradient(90deg,#5a0a0a,#c02020,#f56060)}
+
+    /* ── Badges ── */
+    .badge{display:inline-block;padding:2px 7px;border-radius:3px;font-size:9px;font-weight:600;font-family:'Cinzel',serif;letter-spacing:.3px}
+    .badge-jade{background:rgba(40,120,70,.25);color:#3ecf7e;border:1px solid rgba(40,160,90,.35)}
+    .badge-gold{background:rgba(140,80,20,.25);color:#f5c97a;border:1px solid rgba(180,120,40,.4)}
+    .badge-warn{background:rgba(160,100,10,.25);color:#f59e0b;border:1px solid rgba(200,130,20,.35)}
+    .badge-red{background:rgba(120,20,20,.25);color:#e5534b;border:1px solid rgba(160,40,40,.35)}
+
+    /* ── List rows ── */
+    .list-row{
+      display:flex;align-items:center;gap:9px;padding:8px 4px 7px;
+      border-bottom:1px solid rgba(140,90,20,.18);
+    }
+    .list-row:last-child{border-bottom:none}
+    .list-row.you{background:linear-gradient(90deg,rgba(180,120,40,.15),transparent);border-radius:4px}
+    .rank-num{font-family:'Cinzel',serif;font-size:12px;font-weight:700;width:24px;text-align:center;flex-shrink:0}
+
+    /* ── Buttons ── */
+    .btn{
+      display:inline-flex;align-items:center;justify-content:center;gap:6px;
+      padding:9px 16px;border-radius:6px;cursor:pointer;
+      font-family:'Cinzel',serif;font-size:11.5px;font-weight:600;letter-spacing:.5px;
+      border:1px solid rgba(160,100,30,.5);
+      background:linear-gradient(180deg,rgba(50,28,8,.9),rgba(30,15,4,.95));
+      color:#f0e6d0;transition:transform .1s,filter .1s;
+    }
+    .btn:active{transform:scale(.97)}
+    .btn-primary{border-color:rgba(220,160,50,.6);background:linear-gradient(180deg,rgba(140,80,20,.6),rgba(80,40,8,.8));color:#f5c97a;box-shadow:0 0 12px rgba(180,120,30,.2)}
+    .btn-jade{border-color:rgba(40,160,90,.5);background:rgba(20,70,35,.6);color:#3ecf7e}
+    .btn-danger{border-color:rgba(160,40,40,.5);background:rgba(60,15,15,.6);color:#e5534b}
+
+    /* ── Seg control ── */
+    .seg{display:flex;gap:3px;background:rgba(0,0,0,.5);border:1px solid rgba(140,90,20,.3);border-radius:6px;padding:3px;margin-bottom:9px}
+    .seg-btn{flex:1;background:none;border:1px solid transparent;border-radius:4px;color:var(--text-muted);font-size:10.5px;font-weight:600;padding:6px 0;cursor:pointer;letter-spacing:.5px;font-family:'Cinzel',serif;transition:all .15s}
+    .seg-btn.on{background:linear-gradient(180deg,rgba(160,90,20,.35),rgba(90,45,8,.5));border-color:rgba(180,120,40,.4);color:#f5c97a}
+
+    /* ── Bottom nav (Immortal Idle Taoist style) ── */
+    .tab-bar-wrap{position:absolute;bottom:0;left:0;right:0;z-index:20;flex-direction:column}
+
+    /* Decorative divider above tabs */
+    .tab-divider{width:100%;height:18px;display:block;overflow:hidden;flex-shrink:0}
+
+    .tab-bar{
+      display:flex;justify-content:space-around;
+      padding:5px 0 10px;
+      background:linear-gradient(180deg,rgba(10,6,2,.97),rgba(6,3,1,1));
+      border-top:1px solid rgba(160,100,30,.4);
+    }
+    .tab-btn{
+      flex:1;background:none;border:none;cursor:pointer;
+      display:flex;flex-direction:column;align-items:center;
+      padding:3px 2px;gap:2px;position:relative;
+      transition:all .15s;
+    }
+    /* label on top */
+    .tab-lbl{
+      font-size:8.5px;font-weight:600;letter-spacing:.3px;
+      font-family:'Cinzel',serif;
+      color:var(--text-muted);transition:color .15s;
+      line-height:1;white-space:nowrap;
+    }
+    /* icon on bottom */
+    .tab-ico{font-size:19px;line-height:1;transition:filter .15s,transform .15s}
+    .tab-btn.active .tab-lbl{color:#f5c97a}
+    .tab-btn.active .tab-ico{
+      filter:drop-shadow(0 0 5px rgba(245,200,100,.7)) drop-shadow(0 0 10px rgba(200,140,40,.4));
+      transform:scale(1.08);
+    }
+    /* Active indicator */
+    .tab-btn.active::after{
+      content:'';position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);
+      width:4px;height:4px;border-radius:50%;
+      background:#f5c97a;box-shadow:0 0 8px rgba(245,200,100,.9);
+    }
+
+    /* ── Sidebar ── */
+    .sidebar{width:200px;display:flex;flex-direction:column;gap:18px}
+    .s-title{font-family:'Cinzel',serif;font-size:18px;font-weight:700;line-height:1.3;background:linear-gradient(135deg,#fde68a,#f5c97a,#c9903a);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+    .s-sub{font-size:11px;color:#7a5f3a;margin-top:5px;line-height:1.6}
+    .s-divider{height:1px;background:linear-gradient(90deg,transparent,rgba(180,120,40,.35),transparent)}
+    .s-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(180,120,40,.5);margin-bottom:7px;font-family:'Cinzel',serif}
+    .s-tab-list{display:flex;flex-direction:column;gap:4px}
+    .s-tab{display:flex;align-items:center;gap:9px;padding:7px 11px;border-radius:5px;border:1px solid rgba(80,50,15,.5);background:rgba(12,7,2,.6);cursor:pointer;transition:all .15s}
+    .s-tab.active{border-color:rgba(200,140,40,.45);background:linear-gradient(90deg,rgba(160,90,15,.18),rgba(100,55,8,.1))}
+    .s-tab .s-ico{font-size:14px}
+    .s-tab .s-lbl{font-family:'Cinzel',serif;font-size:10px;font-weight:600;letter-spacing:.4px;color:#7a5f3a}
+    .s-tab.active .s-lbl{color:#f5c97a}
+
+    .realm-picker{display:flex;flex-wrap:wrap;gap:5px}
+    .realm-pip{width:24px;height:24px;border-radius:50%;border:1.5px solid rgba(255,255,255,.1);cursor:pointer;display:grid;place-items:center;font-family:'Noto Serif SC',serif;font-size:10px;font-weight:700;transition:all .15s}
+    .realm-pip.active{border-width:1.5px}
+    .realm-pip:hover{transform:scale(1.15)}
+
+    .s-meta{font-size:10px;color:#4a3820;line-height:1.8}
+    .s-meta b{color:#7a5f3a}
+
+    /* ── Orb ── */
+    .orb-wrap{position:relative;width:190px;height:190px;margin:4px auto 12px;display:grid;place-items:center}
+    .orb-body{position:absolute;inset:20px;border-radius:50%;animation:orb-breathe 4s ease-in-out infinite}
+    .orb-ring-el{position:absolute;inset:0;border-radius:50%;border:1px solid rgba(180,200,255,.2)}
+    .orb-glyph{position:relative;z-index:2;font-family:'Noto Serif SC',serif;font-size:46px;font-weight:700;color:rgba(255,255,255,.92);text-shadow:0 0 14px rgba(255,255,200,.6),0 0 30px currentColor;pointer-events:none;line-height:1}
+    .orb-tick-svg{position:absolute;inset:0;width:100%;height:100%;opacity:.3}
+
+    /* ── Realm scene banner (behind orb) ── */
+    .realm-scene{
+      position:relative;width:100%;border-radius:10px;overflow:hidden;
+      margin-bottom:8px;
+    }
+    .realm-scene-img{
+      width:100%;height:130px;object-fit:cover;object-position:center 30%;
+      display:block;filter:brightness(.5) saturate(.75);
+    }
+    .realm-scene-overlay{
+      position:absolute;inset:0;
+      background:linear-gradient(180deg,rgba(8,4,1,.2) 0%,rgba(8,4,1,.0) 40%,rgba(8,4,1,.85) 100%);
+    }
+    .realm-scene-orb{
+      position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+      padding-bottom:10px;
+    }
+    .realm-scene-info{
+      position:absolute;bottom:0;left:0;right:0;
+      padding:8px 12px;display:flex;justify-content:space-between;align-items:flex-end;
+    }
+    .realm-scene-name{
+      font-family:'Cinzel',serif;font-size:11px;font-weight:600;letter-spacing:.5px;
+    }
+    .realm-scene-next{
+      font-size:9.5px;color:rgba(200,160,80,.7);font-family:'Cinzel',serif;
+      display:flex;flex-direction:column;align-items:flex-end;gap:1px;
+    }
+
+    /* ── Realm progress strip ── */
+    .realm-strip{
+      display:flex;align-items:center;gap:4px;padding:8px 2px;
+      overflow-x:auto;margin-bottom:8px;
+    }
+    .realm-strip::-webkit-scrollbar{display:none}
+    .realm-node{
+      display:flex;flex-direction:column;align-items:center;gap:2px;
+      flex-shrink:0;position:relative;
+    }
+    .realm-node-dot{
+      width:28px;height:28px;border-radius:50%;
+      display:grid;place-items:center;
+      font-family:'Noto Serif SC',serif;font-size:11px;font-weight:700;
+      border:1.5px solid;transition:all .2s;
+    }
+    .realm-node-dot.current{width:34px;height:34px;font-size:13px}
+    .realm-node-lbl{font-size:7.5px;color:#4a3820;font-family:'Cinzel',serif;letter-spacing:.2px;max-width:30px;text-align:center;line-height:1.2}
+    .realm-node-lbl.current{color:#f5c97a}
+    .realm-connector{width:12px;height:1.5px;background:rgba(140,90,20,.3);flex-shrink:0;margin-bottom:12px}
+    .realm-connector.done{background:rgba(180,120,40,.6)}
+
+    /* ── Card side accent ── */
+    .card-side-accent{
+      position:absolute;left:0;top:12%;bottom:12%;width:2px;border-radius:2px;
+      background:linear-gradient(180deg,transparent,rgba(200,140,40,.6),rgba(200,140,40,.9),rgba(200,140,40,.6),transparent);
+    }
+
+    /* ── Boss scene ── */
+    .boss-scene{
+      position:relative;border-radius:8px;overflow:hidden;margin-bottom:0;
+    }
+    .boss-scene-img{
+      width:100%;height:120px;object-fit:cover;object-position:center 20%;
+      display:block;filter:brightness(.4) saturate(.6) hue-rotate(-10deg);
+    }
+    .boss-scene-overlay{
+      position:absolute;inset:0;
+      background:linear-gradient(180deg,rgba(40,0,0,.3),rgba(0,0,0,.6));
+    }
+    .boss-scene-content{
+      position:absolute;inset:0;display:flex;flex-direction:column;
+      align-items:center;justify-content:center;gap:4px;
+    }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useMemo } = React;
+
+// ─── Data ────────────────────────────────────────────────────────────────────
+const REALM_GLYPHS = ["凡","氣","築","核","嬰","化","虛","合","大","渡","仙"];
+const REALM_NAMES  = ["Mortal","Qi Condensation","Foundation","Core Formation","Nascent Soul","Soul Transformation","Void Refinement","Body Integration","Mahayana","Tribulation","True Immortal"];
+const REALM_COLORS = ["#9ca3af","#60a5fa","#fbbf24","#a855f7","#2dd4bf","#3b82f6","#8b5cf6","#f59e0b","#38bdf8","#eab308","#f472b6"];
+const TAB_DEFS = [
+  { key:"cultivation", ico:"☯️", label:"Cultivo" },
+  { key:"sect",        ico:"🏯", label:"Seita" },
+  { key:"world_boss",  ico:"🐉", label:"Chefe" },
+  { key:"leaderboard", ico:"🏆", label:"Ranking" },
+  { key:"inventory",   ico:"🎒", label:"Anel" },
+  { key:"quests",      ico:"🎯", label:"Missões" },
+  { key:"announcements",ico:"📜",label:"Notícias" },
+];
+
+function fmtNum(n){n=Number(n)||0;if(n>=1e9)return(n/1e9).toFixed(2)+"B";if(n>=1e6)return(n/1e6).toFixed(2)+"M";if(n>=1e3)return(n/1e3).toFixed(1)+"K";return Math.round(n).toString()}
+function fmtDur(ms){if(ms<=0)return"—";const s=Math.floor(ms/1000),h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sc=s%60;return h>0?`${h}h ${m}m`:m>0?`${m}m ${sc}s`:`${sc}s`}
+
+const PLAYER = { dao_name:"劍天明 · Jian Tianming", active_title:"Arcanista dos Picos Nevados", realm:4, sub_layer:7, spirit_jade:1240, spirit_stones:340000, celestial_fragments:88, spirit_root:"Celestial", battle_power:2400000, soul_strength:180000, perception:94000, luck:12000, body_tempering_level:3, prestige_level:2 };
+
+// ─── Ornate card corners ───────────────────────────────────────────────────
+function Corners({c="rgba(200,140,40,.45)",s=12}){
+  const pos=[{top:0,left:0,r:"0"},{top:0,right:0,r:"90"},{bottom:0,right:0,r:"180"},{bottom:0,left:0,r:"270"}];
+  return <>{pos.map((p,i)=>(
+    <div key={i} className="card-corner" style={p}>
+      <svg viewBox="0 0 12 12" fill="none">
+        <g transform={`rotate(${p.r},6,6)`} stroke={c} strokeWidth="1">
+          <path d="M1,6 L1,1 L6,1"/><path d="M1,3.5 L3.5,1"/>
+          <circle cx="1.2" cy="1.2" r="1" fill={c} stroke="none"/>
+        </g>
+      </svg>
+    </div>
+  ))}</>;
+}
+
+// ─── Card ─────────────────────────────────────────────────────────────────
+function Card({children,style,accent=true}){
+  return (
+    <div className="card" style={style}>
+      <div className="card-texture"/>
+      {accent && <div className="card-side-accent"/>}
+      <Corners/>
+      <div className="card-inner">{children}</div>
+    </div>
+  );
+}
+function CardTitle({l,r}){
+  return <div className="card-title"><span>{l}</span>{r&&<b>{r}</b>}</div>;
+}
+function Bar({pct,v="cult"}){
+  return <div className={`bar-wrap bar-${v}`}><div className="bar-fill" style={{width:Math.min(100,Math.max(0,pct))+"%"}}/></div>;
+}
+function Badge({children,v="jade"}){return <span className={`badge badge-${v}`}>{children}</span>}
+function StatGrid({stats}){
+  return <div className="stat-grid">{stats.map((s,i)=>(
+    <div key={i} className="stat-cell">
+      <div className="stat-label">{s.l}</div>
+      <div className="stat-value" style={s.c?{color:s.c}:{}}>{s.v}</div>
+    </div>
+  ))}</div>;
+}
+
+// ─── Orb ──────────────────────────────────────────────────────────────────
+function Orb({realm=4,meditating=false}){
+  const r=Math.min(realm,10), rc=REALM_COLORS[r];
+  const ORBS = {
+    0:"radial-gradient(circle at 36% 30%,rgba(210,220,230,.4),transparent 45%),radial-gradient(circle at 50%,#9ca3af,#374151 70%,#111827)",
+    1:"radial-gradient(circle at 36% 30%,rgba(190,220,255,.5),transparent 45%),radial-gradient(circle at 50%,#60a5fa,#1d4ed8 70%,#0c1a4a)",
+    2:"radial-gradient(circle at 36% 30%,rgba(255,240,180,.5),transparent 45%),radial-gradient(circle at 50%,#fbbf24,#92400e 70%,#3a1a05)",
+    3:"radial-gradient(circle at 36% 30%,rgba(225,195,255,.5),transparent 45%),radial-gradient(circle at 50%,#a855f7,#6b21a8 70%,#2d0a5c)",
+    4:"radial-gradient(circle at 36% 30%,rgba(180,255,240,.5),transparent 45%),radial-gradient(circle at 50%,#2dd4bf,#0f766e 70%,#042f2e)",
+    5:"radial-gradient(circle at 36% 30%,rgba(180,210,255,.5),transparent 45%),radial-gradient(circle at 50%,#3b82f6,#1e3a8a 70%,#0a1a4a)",
+    6:"radial-gradient(circle at 36% 30%,rgba(200,185,255,.5),transparent 45%),radial-gradient(circle at 50%,#8b5cf6,#4c1d95 70%,#1e0a40)",
+    7:"radial-gradient(circle at 36% 30%,rgba(255,230,170,.5),transparent 45%),radial-gradient(circle at 50%,#f59e0b,#92400e 70%,#3a1a05)",
+    8:"radial-gradient(circle at 36% 30%,rgba(180,240,255,.5),transparent 45%),radial-gradient(circle at 50%,#38bdf8,#0369a1 70%,#022d4a)",
+    9:"radial-gradient(circle at 36% 30%,rgba(255,240,150,.5),transparent 45%),radial-gradient(circle at 50%,#eab308,#854d0e 70%,#362003)",
+    10:"radial-gradient(circle at 36% 30%,rgba(255,200,230,.65),transparent 40%),radial-gradient(circle at 70% 70%,rgba(201,144,58,.5),transparent 55%),radial-gradient(circle at 50%,#f9a8d4,#c9903a 60%,#7c2d12)",
+  };
+  const medOrb="radial-gradient(circle at 36% 30%,rgba(255,255,255,.6),transparent 45%),radial-gradient(circle at 70% 70%,rgba(168,85,247,.55),transparent 60%),radial-gradient(circle at 50%,#b478ff,#5f2da3 70%,#2a0e5e)";
+  const bg=meditating?medOrb:ORBS[r];
+  const glow=meditating
+    ?"0 0 55px rgba(168,85,247,.6),0 0 90px rgba(168,85,247,.25),inset 0 0 22px rgba(220,200,255,.4)"
+    :r===10?"0 0 55px rgba(244,114,182,.5),0 0 80px rgba(201,144,58,.3),inset 0 0 20px rgba(255,240,200,.4)"
+    :`0 0 45px ${rc}88,0 0 65px ${rc}33,inset 0 0 16px rgba(255,255,255,.18)`;
+  const pts=useMemo(()=>Array.from({length:14},()=>({l:28+Math.random()*44+"%",dx:(Math.random()*60-30)+"px",d:-(Math.random()*3)+"s",sz:2.5+Math.random()*2})),[meditating]);
+
+  return (
+    <div className="orb-wrap">
+      {[0,1,2].map(i=><div key={i} className="orb-ring-el" style={{animation:`orb-ring-out ${meditating?3:6}s ease-out ${meditating?i:i*2}s infinite`,opacity:meditating?.7:.25}}/>)}
+      <svg className="orb-tick-svg" viewBox="0 0 190 190">
+        <circle cx="95" cy="95" r="90" stroke={`${rc}66`} strokeWidth=".6" fill="none" strokeDasharray="3 9"/>
+        {Array.from({length:8},(_,i)=>{const a=(i/8)*Math.PI*2,r1=84,r2=91,x1=95+r1*Math.cos(a),y1=95+r1*Math.sin(a),x2=95+r2*Math.cos(a),y2=95+r2*Math.sin(a);return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke={`${rc}bb`} strokeWidth="1.5"/>})}
+      </svg>
+      <div className="orb-body" style={{background:bg,boxShadow:glow,animationDuration:meditating?"2.6s":"4s"}}/>
+      <div style={{position:"absolute",inset:0,pointerEvents:"none"}}>
+        {meditating&&pts.map((p,i)=><span key={i} style={{position:"absolute",bottom:"50%",left:p.l,width:p.sz,height:p.sz,borderRadius:"50%",background:"rgba(200,170,255,.9)",boxShadow:"0 0 5px rgba(200,170,255,.8)",animation:`qi-rise 3s ease-out ${p.d} infinite`,"--dx":p.dx}}/>)}
+      </div>
+      <div className="orb-glyph" style={{color:rc,textShadow:`0 0 16px ${rc},0 0 30px ${rc}88`}}>
+        {meditating?"氣":"道"}
+      </div>
+    </div>
+  );
+}
+
+// ─── Header ───────────────────────────────────────────────────────────────
+function Header({player}){
+  const rc=REALM_COLORS[player.realm||0];
+  const r=player.realm||0;
+  return (
+    <div className="header" style={{position:"relative",overflow:"hidden"}}>
+      {/* Realm art as very subtle header bg */}
+      <img src={REALM_IMGS[r]} alt="" style={{
+        position:"absolute",inset:0,width:"100%",height:"100%",
+        objectFit:"cover",objectPosition:"center 25%",
+        filter:"brightness(.18) saturate(.5)",
+        pointerEvents:"none",zIndex:0,
+      }}/>
+      {/* Left edge glow matching realm color */}
+      <div style={{position:"absolute",left:0,top:0,bottom:0,width:3,background:`linear-gradient(180deg,transparent,${rc}88,${rc},${rc}88,transparent)`,zIndex:1}}/>
+      <div style={{position:"relative",zIndex:2}}>
+        <div className="header-row">
+          <div>
+            <div className="dao-name">{player.dao_name}</div>
+            {player.active_title&&<div className="dao-title">✦ {player.active_title}</div>}
+          </div>
+          <div className="realm-badge" style={{borderColor:`${rc}99`,boxShadow:`0 0 14px ${rc}55`}}>
+            <div className="rb-glyph" style={{color:rc}}>{REALM_GLYPHS[r]}</div>
+            <div className="rb-sub" style={{color:rc}}>{REALM_NAMES[r].split(" ").slice(0,2).join(" ")} {player.sub_layer}</div>
+          </div>
+        </div>
+        <div className="currencies">
+          <span className="curr">💎<b>{fmtNum(player.spirit_jade)}</b></span>
+          <span className="curr">🪨<b>{fmtNum(player.spirit_stones)}</b></span>
+          {player.celestial_fragments>0&&<span className="curr">✨<b>{fmtNum(player.celestial_fragments)}</b></span>}
+          <span className="spirit-root">✦ {player.spirit_root}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Tab bar ──────────────────────────────────────────────────────────────
+function TabBar({tab,setTab}){
+  return (
+    <div className="tab-bar-wrap" style={{display:"flex",flexDirection:"column"}}>
+      {/* Cloud divider SVG */}
+      <svg className="tab-divider" viewBox="0 0 375 18" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="tg" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="rgba(180,120,40,0)"/>
+            <stop offset="25%" stopColor="rgba(200,140,50,.7)"/>
+            <stop offset="50%" stopColor="rgba(245,200,100,.95)"/>
+            <stop offset="75%" stopColor="rgba(200,140,50,.7)"/>
+            <stop offset="100%" stopColor="rgba(180,120,40,0)"/>
+          </linearGradient>
+        </defs>
+        <path d="M0,18 C20,12 40,5 65,9 C85,12 100,17 125,14 C145,11 158,4 175,7 C192,10 205,17 228,14 C250,11 265,4 285,7 C305,10 325,17 350,13 C365,10 375,7 375,7 L375,18Z" fill="rgba(10,6,2,.97)"/>
+        <path d="M0,18 C20,12 40,5 65,9 C85,12 100,17 125,14 C145,11 158,4 175,7 C192,10 205,17 228,14 C250,11 265,4 285,7 C305,10 325,17 350,13 C365,10 375,7 375,7" fill="none" stroke="url(#tg)" strokeWidth="1.2"/>
+        {[[65,9],[125,14],[175,7],[228,14],[285,7]].map(([x,y],i)=>(
+          <circle key={i} cx={x} cy={y} r="1.8" fill="rgba(245,200,100,.8)"/>
+        ))}
+      </svg>
+      <div className="tab-bar">
+        {TAB_DEFS.map(td=>(
+          <button key={td.key} className={`tab-btn${tab===td.key?" active":""}`} onClick={()=>setTab(td.key)}>
+            <span className="tab-lbl">{td.label}</span>
+            <span className="tab-ico">{td.ico}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── Realm image map ──────────────────────────────────────────────────────
+const REALM_IMGS = [
+  "../../assets/realm-mortal.webp",
+  "../../assets/realm-qi.webp",
+  "../../assets/realm-foundation.webp",
+  "../../assets/realm-core.webp",
+  "../../assets/realm-nascent-soul.webp",
+  "../../assets/realm-soul-transformation.webp",
+  "../../assets/realm-void-refinement.webp",
+  "../../assets/realm-body-integration.webp",
+  "../../assets/realm-mahayana.webp",
+  "../../assets/realm-tribulation.webp",
+  "../../assets/realm-true-immortal.webp",
+];
+
+// ─── Realm Scene Banner ───────────────────────────────────────────────────
+function RealmScene({realm, meditating, onToggleMed}){
+  const r = Math.min(realm, 10);
+  const rc = REALM_COLORS[r];
+  const nextR = Math.min(r+1, 10);
+  return (
+    <div className="realm-scene" style={{marginBottom:10}}>
+      <img className="realm-scene-img" src={REALM_IMGS[r]} alt={REALM_NAMES[r]}/>
+      <div className="realm-scene-overlay"/>
+      {/* Orb centered on the scene */}
+      <div className="realm-scene-orb">
+        <Orb realm={realm} meditating={meditating}/>
+      </div>
+      <div className="realm-scene-info">
+        <div>
+          <div className="realm-scene-name" style={{color:rc}}>
+            {REALM_GLYPHS[r]} {REALM_NAMES[r]}
+          </div>
+          <div style={{fontSize:9,color:"rgba(180,130,60,.6)",fontFamily:"'Cinzel',serif",marginTop:1}}>
+            Camada 7 · 72.4%
+          </div>
+        </div>
+        <div className="realm-scene-next">
+          <div style={{fontSize:8,color:"rgba(180,130,60,.5)"}}>Próximo</div>
+          <div style={{fontSize:10,color:REALM_COLORS[nextR],fontFamily:"'Noto Serif SC',serif",fontWeight:700}}>
+            {REALM_GLYPHS[nextR]}
+          </div>
+          <div style={{fontSize:8,color:REALM_COLORS[nextR],fontFamily:"'Cinzel',serif"}}>{REALM_NAMES[nextR].split(" ")[0]}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Realm Progress Strip ─────────────────────────────────────────────────
+function RealmStrip({realm}){
+  const r = Math.min(realm, 10);
+  // Show 3 before, current, 2 after (clamped)
+  const start = Math.max(0, r-2);
+  const end   = Math.min(10, r+3);
+  const visible = Array.from({length: end-start}, (_,i)=>start+i);
+
+  return (
+    <div style={{display:"flex",alignItems:"center",gap:0,padding:"4px 0 10px",overflowX:"auto",WebkitOverflowScrolling:"touch"}}>
+      <div style={{display:"flex",alignItems:"center",gap:0,flexShrink:0,margin:"0 auto"}}>
+        {visible.map((idx,i)=>{
+          const rc = REALM_COLORS[idx];
+          const isCurr = idx===r;
+          const isDone = idx<r;
+          return (
+            <React.Fragment key={idx}>
+              {i>0 && <div style={{width:14,height:1.5,background:isDone?"rgba(180,120,40,.55)":"rgba(80,50,15,.3)",flexShrink:0,marginBottom:14}}/>}
+              <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:3,flexShrink:0}}>
+                <div style={{
+                  width:isCurr?36:26,height:isCurr?36:26,
+                  borderRadius:"50%",display:"grid",placeItems:"center",
+                  fontFamily:"'Noto Serif SC',serif",fontSize:isCurr?14:10,fontWeight:700,
+                  color:isDone?"rgba(180,120,40,.7)":isCurr?rc:"rgba(80,50,15,.6)",
+                  border:`${isCurr?2:1.5}px solid ${isDone?"rgba(160,100,30,.5)":isCurr?rc:"rgba(60,35,8,.5)"}`,
+                  background:isCurr?`${rc}22`:isDone?"rgba(120,70,10,.15)":"rgba(0,0,0,.3)",
+                  boxShadow:isCurr?`0 0 14px ${rc}88,0 0 28px ${rc}33`:"none",
+                  transition:"all .25s",
+                }}>
+                  {isDone?"✓":REALM_GLYPHS[idx]}
+                </div>
+                <div style={{
+                  fontSize:7,fontFamily:"'Cinzel',serif",letterSpacing:.2,
+                  color:isCurr?"#f5c97a":isDone?"rgba(160,110,40,.6)":"rgba(60,40,10,.7)",
+                  maxWidth:34,textAlign:"center",lineHeight:1.2,
+                }}>
+                  {REALM_NAMES[idx].split(" ")[0]}
+                </div>
+              </div>
+            </React.Fragment>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ─── Cultivation tab ──────────────────────────────────────────────────────
+function CultivationTab({player}){
+  const [med,setMed]=useState(false);
+  const cbPct=72.4, qiPct=55;
+  const medTypes=["🧘 Leve","🔮 Profunda","💜 Vazio","🌠 Celestial"];
+  return (
+    <div>
+      {/* Realm scene banner with orb floating on artwork */}
+      <RealmScene realm={player.realm} meditating={med}/>
+      {/* Realm progression strip */}
+      <RealmStrip realm={player.realm}/>
+      <Card>
+        <CardTitle l="Cultivo" r={cbPct+"%"}/>
+        <Bar pct={cbPct} v="cult"/>
+        <div style={{display:"flex",justifyContent:"space-between",marginTop:5,fontSize:11,color:"#7a5f3a"}}>
+          <span>720K / 995K</span><span style={{color:"#b89a6a"}}>{REALM_NAMES[player.realm]}</span>
+        </div>
+      </Card>
+      <Card>
+        <CardTitle l="Qi" r={qiPct+"%"}/>
+        <Bar pct={qiPct} v="qi"/>
+        <div style={{display:"flex",justifyContent:"space-between",marginTop:5,fontSize:11,color:"#7a5f3a"}}>
+          <span>5.5K / 10K</span>
+          {med&&<Badge v="jade">×3.0 qi/s</Badge>}
+        </div>
+      </Card>
+      <Card>
+        <CardTitle l="Meditação"/>
+        {med?(
+          <div>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+              <span style={{fontSize:13,fontWeight:600,color:"#f0e6d0"}}>🔮 Profunda</span>
+              <Badge v="gold">×3.0</Badge>
+            </div>
+            <div style={{display:"flex",justifyContent:"space-between",marginTop:8,fontSize:12,color:"#7a5f3a"}}>
+              <span>Termina em</span><b style={{color:"#f5c97a"}}>2h 30m</b>
+            </div>
+            <button className="btn btn-danger" onClick={()=>setMed(false)} style={{marginTop:10,width:"100%"}}>Interromper</button>
+          </div>
+        ):(
+          <div>
+            <div style={{fontSize:11,color:"#7a5f3a",marginBottom:9,textAlign:"center"}}>Escolhe o tipo de meditação</div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}}>
+              {medTypes.map(m=><button key={m} className="btn" onClick={()=>setMed(true)} style={{padding:"7px",fontSize:11,justifyContent:"flex-start"}}>{m}</button>)}
+            </div>
+          </div>
+        )}
+      </Card>
+      <Card>
+        <CardTitle l="Atributos"/>
+        <StatGrid stats={[
+          {l:"Poder de Combate",v:fmtNum(player.battle_power)},
+          {l:"Força da Alma",v:fmtNum(player.soul_strength)},
+          {l:"Percepção",v:fmtNum(player.perception)},
+          {l:"Sorte",v:fmtNum(player.luck)},
+          {l:"Têmpera",v:"Nv "+player.body_tempering_level},
+          {l:"Prestígio",v:"Nv "+player.prestige_level},
+        ]}/>
+      </Card>
+    </div>
+  );
+}
+
+// ─── Sect tab ─────────────────────────────────────────────────────────────
+function SectTab(){
+  const BICONS={training:"⚔️",herb_garden:"🌿",forge:"⚒️",library:"📜",defense:"🛡️",spirit_vein:"💫"};
+  const BNAMES={training:"Treino",herb_garden:"Jardim",forge:"Forja",library:"Biblioteca",defense:"Defesa",spirit_vein:"Veia"};
+  const s={name:"Seita dos Picos Nevados",bulletin:"O Caminho é longo. A vontade, eterna.",member_count:18,max_members:30,spirit_stones:2800000,your_contribution:145000,your_rank:"elder",buildings:{training:4,herb_garden:3,forge:2,library:3,defense:2,spirit_vein:1}};
+  const members=[
+    {name:"劍天明",rank:"master",realm:7,sub_layer:9,contribution:980000},
+    {name:"Lírio do Abismo",rank:"elder",realm:6,sub_layer:4,contribution:420000},
+    {name:"Jian Tianming",rank:"elder",realm:4,sub_layer:7,contribution:145000},
+    {name:"Espada Eterna",rank:"member",realm:3,sub_layer:2,contribution:88000},
+    {name:"Vento das Alturas",rank:"member",realm:2,sub_layer:9,contribution:52000},
+  ];
+  return (
+    <div>
+      {/* Sect banner with alchemy art */}
+      <div style={{position:"relative",borderRadius:8,overflow:"hidden",marginBottom:9,height:80}}>
+        <img src="../../assets/alchemy-art.webp" alt="" style={{width:"100%",height:"100%",objectFit:"cover",objectPosition:"center",filter:"brightness(.35) saturate(.7)"}}/>
+        <div style={{position:"absolute",inset:0,background:"linear-gradient(90deg,rgba(8,4,1,.8),rgba(8,4,1,.2) 50%,rgba(8,4,1,.8))"}}/>
+        <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",gap:2}}>
+          <div style={{fontFamily:"'Cinzel',serif",fontSize:16,fontWeight:700,background:"linear-gradient(90deg,#fde68a,#f5c97a,#c9903a)",WebkitBackgroundClip:"text",backgroundClip:"text",WebkitTextFillColor:"transparent",letterSpacing:.5}}>{s.name}</div>
+          <div style={{fontSize:10,color:"rgba(180,130,60,.7)",fontStyle:"italic",fontFamily:"'Noto Serif SC',serif"}}>"{s.bulletin}"</div>
+        </div>
+      </div>
+      <Card>
+        <CardTitle l="Visão Geral" r={`${s.member_count}/${s.max_members}`}/>
+        <StatGrid stats={[
+          {l:"Tesouro",v:"🪨 "+fmtNum(s.spirit_stones)},
+          {l:"Contribuição",v:fmtNum(s.your_contribution)},
+          {l:"Posição",v:s.your_rank==="master"?"Mestre":s.your_rank==="elder"?"Ancião":"Membro"},
+          {l:"Total Edifícios",v:Object.values(s.buildings).reduce((a,b)=>a+b,0)},
+        ]}/>
+      </Card>
+      <Card>
+        <CardTitle l="Edifícios"/>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:6}}>
+          {Object.entries(s.buildings).map(([k,lvl])=>(
+            <div key={k} style={{background:"rgba(0,0,0,.4)",border:"1px solid rgba(140,90,20,.2)",borderRadius:5,padding:"9px 6px",textAlign:"center"}}>
+              <div style={{fontSize:20}}>{BICONS[k]}</div>
+              <div style={{fontSize:9,color:"#7a5f3a",marginTop:3,textTransform:"uppercase",letterSpacing:.5}}>{BNAMES[k]}</div>
+              <div style={{fontSize:12,fontWeight:600,color:lvl>0?"#f5c97a":"#4a3820",marginTop:2}}>Nv {lvl||"—"}</div>
+            </div>
+          ))}
+        </div>
+      </Card>
+      <Card>
+        <CardTitle l="Membros" r={members.length}/>
+        {members.map((m,i)=>(
+          <div key={i} className="list-row">
+            <div className="rank-num" style={{color:["#ffd700","#c0c0c0","#cd7f32"][i]||"rgba(180,120,40,.7)"}}>
+              {i<3?["①","②","③"][i]:`#${i+1}`}
+            </div>
+            <div style={{flex:1,fontSize:12.5,fontWeight:500}}>
+              {m.name}{" "}
+              {m.rank==="master"&&<Badge v="gold">Mestre</Badge>}
+              {m.rank==="elder"&&<Badge v="warn">Ancião</Badge>}
+            </div>
+            <div style={{fontSize:10.5,color:"#7a5f3a",textAlign:"right"}}>
+              {REALM_GLYPHS[m.realm]}{m.sub_layer} · {fmtNum(m.contribution)}
+            </div>
+          </div>
+        ))}
+      </Card>
+    </div>
+  );
+}
+
+// ─── World Boss tab ───────────────────────────────────────────────────────
+function BossTab(){
+  const b={name:"Dragão Celestial do Caos Primordial",emoji:"🐲",tier:"Ancestral",phase:"Fase II",hp:3500000000,current_hp:1190000000,expires:4.37*3600*1000};
+  const hpPct=(b.current_hp/b.hp)*100;
+  const ranking=[
+    {rank:1,name:"劍天明",dmg:820000000,hits:1240,you:false},
+    {rank:2,name:"Lírio do Abismo",dmg:610000000,hits:980,you:false},
+    {rank:3,name:"Espada Imortal",dmg:390000000,hits:720,you:false},
+    {rank:4,name:"Tu",dmg:48200000,hits:94,you:true},
+  ];
+  return (
+    <div>
+      {/* Boss scene — tribulation art as dramatic banner */}
+      <div className="boss-scene" style={{marginBottom:9}}>
+        <img className="boss-scene-img" src="../../assets/realm-tribulation.webp" alt="Boss"/>
+        <div className="boss-scene-overlay"/>
+        <div className="boss-scene-content">
+          <div style={{fontSize:54,filter:"drop-shadow(0 0 18px rgba(255,60,30,.7)) drop-shadow(0 0 36px rgba(200,0,0,.4))",lineHeight:1,animation:"orb-breathe 3s ease-in-out infinite"}}>{b.emoji}</div>
+          <div style={{fontFamily:"'Cinzel',serif",fontSize:14,letterSpacing:.4,color:"#f0e6d0",textShadow:"0 2px 8px rgba(0,0,0,.8)",textAlign:"center",padding:"0 16px"}}>{b.name}</div>
+          <div style={{fontSize:9,color:"#f5c97a",letterSpacing:1.5,textTransform:"uppercase",marginTop:2}}>{b.tier} · {b.phase}</div>
+        </div>
+        {/* Ornate corner on the scene */}
+        {[{top:4,left:4,r:"0"},{top:4,right:4,r:"90"},{bottom:4,right:4,r:"180"},{bottom:4,left:4,r:"270"}].map((p,i)=>(
+          <div key={i} style={{position:"absolute",width:14,height:14,...p}}>
+            <svg viewBox="0 0 12 12" fill="none" style={{width:"100%",height:"100%"}}>
+              <g transform={`rotate(${p.r},6,6)`} stroke="rgba(220,160,60,.6)" strokeWidth="1">
+                <path d="M1,6 L1,1 L6,1"/><path d="M1,3.5 L3.5,1"/>
+                <circle cx="1.2" cy="1.2" r="1" fill="rgba(220,160,60,.7)" stroke="none"/>
+              </g>
+            </svg>
+          </div>
+        ))}
+      </div>
+      <Card>
+        <div style={{marginBottom:10}}>
+          <Bar pct={hpPct} v="hp"/>
+          <div style={{display:"flex",justifyContent:"space-between",marginTop:5,fontSize:11,color:"#7a5f3a"}}>
+            <span>{fmtNum(b.current_hp)} / {fmtNum(b.hp)} HP</span>
+            <span>⏱️ {fmtDur(b.expires)}</span>
+          </div>
+        </div>
+        <div style={{display:"flex",justifyContent:"space-between",marginBottom:10,fontSize:12}}>
+          <span style={{color:"#7a5f3a"}}>Teu dano</span>
+          <b style={{color:"#f5c97a"}}>⚔️ 48.2M</b>
+        </div>
+        <button className="btn btn-primary" style={{width:"100%"}}>⚔️ Atacar Boss</button>
+      </Card>
+      <Card>
+        <CardTitle l="Top Cultivadores"/>
+        {ranking.map(r=>(
+          <div key={r.rank} className={`list-row${r.you?" you":""}`}>
+            <div className="rank-num" style={{color:["#ffd700","#c0c0c0","#cd7f32"][r.rank-1]||"rgba(180,120,40,.7)"}}>
+              {r.rank<=3?["①","②","③"][r.rank-1]:`#${r.rank}`}
+            </div>
+            <div style={{flex:1,fontSize:12.5}}>{r.name}</div>
+            <div style={{fontSize:10.5,color:"#7a5f3a"}}>⚔️ {fmtNum(r.dmg)} · {r.hits}x</div>
+          </div>
+        ))}
+      </Card>
+    </div>
+  );
+}
+
+// ─── Leaderboard tab ──────────────────────────────────────────────────────
+function LeaderboardTab(){
+  const [type,setType]=useState("cultivation");
+  const entries=[
+    {rank:1,name:"劍天明",g:"仙",sub:9,val:12400000,prestige:3},
+    {rank:2,name:"Lírio do Abismo",g:"渡",sub:8,val:9100000,prestige:2},
+    {rank:3,name:"Espada Imortal",g:"大",sub:6,val:7800000,prestige:1},
+    {rank:4,name:"Vento Eterno",g:"虛",sub:4,val:5200000,prestige:0},
+    {rank:5,name:"Nuvem Celestial",g:"合",sub:2,val:3900000,prestige:0},
+    {rank:47,name:"Jian Tianming",g:"嬰",sub:7,val:720000,prestige:0},
+  ];
+  return (
+    <div>
+      <div className="seg">
+        {["cultivation","power","sects"].map((t,i)=>(
+          <button key={t} className={`seg-btn${type===t?" on":""}`} onClick={()=>setType(t)}>
+            {["Cultivo","Poder","Seitas"][i]}
+          </button>
+        ))}
+      </div>
+      <Card>
+        {entries.map((e,i)=>(
+          <div key={i} className={`list-row${e.rank===47?" you":""}`}>
+            <div className="rank-num" style={{color:["#ffd700","#c0c0c0","#cd7f32"][e.rank-1]||"rgba(180,120,40,.7)"}}>
+              {e.rank<=3?["①","②","③"][e.rank-1]:`#${e.rank}`}
+            </div>
+            <div style={{flex:1,fontSize:12.5}}>
+              {e.name}
+              {e.prestige>0&&<span style={{marginLeft:5}}><Badge v="jade">P{e.prestige}</Badge></span>}
+            </div>
+            <div style={{fontSize:10.5,color:"#7a5f3a"}}>{e.g}{e.sub} · ☯️ {fmtNum(e.val)}</div>
+          </div>
+        ))}
+      </Card>
+    </div>
+  );
+}
+
+// ─── Inventory tab ────────────────────────────────────────────────────────
+function InventoryTab(){
+  const [tt,setTt]=useState(null);
+  const GC=["#9ca3af","#60a5fa","#3ecf7e","#a855f7","#f59e0b","#f472b6","#38bdf8","#f5c97a","#f472b6"];
+  const SLOTS={weapon:"🗡️",armor:"🛡️",ring:"💍"};
+  const equipped=[{id:1,grade:6,slot:"weapon"},{id:2,grade:5,slot:"armor"},{id:3,grade:4,slot:"ring"}];
+  const stash=[{id:4,grade:3,slot:"weapon"},{id:5,grade:3,slot:"armor"},{id:6,grade:2,slot:"ring"},{id:7,grade:4,slot:"weapon"},{id:8,grade:1,slot:"armor"},{id:9,grade:2,slot:"ring"}];
+  const items=[{t:"pill",qty:12},{t:"herb",qty:8},{t:"ore",qty:3},{t:"pill",qty:1},{t:"herb",qty:24},{t:"pill",qty:2}];
+  const itIco={pill:"💊",herb:"🌿",ore:"⚒️"};
+
+  function Cell({a,isEquipped}){
+    return (
+      <div onClick={()=>setTt(tt===a.id?null:a.id)} style={{
+        aspectRatio:1,background:`linear-gradient(180deg,rgba(35,18,5,.9),rgba(20,10,3,.95))`,
+        border:`1px solid ${isEquipped?"rgba(220,160,50,.65)":"rgba(120,80,20,.3)"}`,
+        borderRadius:6,display:"grid",placeItems:"center",position:"relative",cursor:"pointer",
+        boxShadow:isEquipped?"inset 0 0 8px rgba(200,140,30,.25),0 0 10px rgba(180,120,30,.2)":"none",
+      }}>
+        {isEquipped&&<div style={{position:"absolute",inset:0,borderRadius:6,background:"radial-gradient(circle,rgba(200,140,30,.08),transparent 70%)"}}/>}
+        <span style={{fontSize:20,position:"relative",zIndex:1}}>{SLOTS[a.slot]||"🗡️"}</span>
+        <span style={{position:"absolute",left:3,top:2,fontSize:8.5,fontWeight:700,color:GC[a.grade]}}>G{a.grade}</span>
+        {tt===a.id&&(
+          <div style={{position:"absolute",bottom:"110%",left:"50%",transform:"translateX(-50%)",background:"rgba(14,8,2,.97)",border:"1px solid rgba(180,120,40,.5)",borderRadius:7,padding:"8px 11px",zIndex:20,whiteSpace:"nowrap",fontSize:11,boxShadow:"0 4px 20px rgba(0,0,0,.7)"}}>
+            <div style={{fontFamily:"'Cinzel',serif",fontSize:11,color:"#f5c97a",marginBottom:3}}>Artefacto G{a.grade}</div>
+            <div style={{color:"#7a5f3a"}}>Slot: {a.slot}</div>
+            {isEquipped&&<div style={{color:"#3ecf7e",marginTop:2}}>✦ Equipado</div>}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <Card><CardTitle l="Equipado" r={`${equipped.length}/6`}/>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:6}}>
+          {equipped.map(a=><Cell key={a.id} a={a} isEquipped/>)}
+          {Array.from({length:3}).map((_,i)=><div key={i} style={{aspectRatio:1,background:"rgba(0,0,0,.3)",border:"1px dashed rgba(100,65,15,.3)",borderRadius:6,opacity:.4}}/>)}
+        </div>
+      </Card>
+      <Card><CardTitle l="Anel Espacial" r={stash.length}/>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:6}}>
+          {stash.map(a=><Cell key={a.id} a={a} isEquipped={false}/>)}
+        </div>
+      </Card>
+      <Card><CardTitle l="Itens" r={items.length}/>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:6}}>
+          {items.map((it,i)=>(
+            <div key={i} style={{aspectRatio:1,background:"rgba(20,10,3,.9)",border:"1px solid rgba(120,80,20,.3)",borderRadius:6,display:"grid",placeItems:"center",position:"relative"}}>
+              <span style={{fontSize:19}}>{itIco[it.t]||"📦"}</span>
+              <span style={{position:"absolute",right:3,bottom:2,fontSize:10,fontWeight:700,color:"#f5c97a"}}>{it.qty}</span>
+            </div>
+          ))}
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+// ─── Quests tab ───────────────────────────────────────────────────────────
+function QuestsTab(){
+  const quests=[
+    {id:1,t:"daily",name:"Meditar 2 horas",ico:"🧘",desc:"Entra em meditação por 2h.",obj:2,prog:2,done:true,claimed:false},
+    {id:2,t:"daily",name:"Atacar o Chefe",ico:"⚔️",desc:"Inflige dano ao chefe mundial.",obj:1,prog:1,done:true,claimed:true},
+    {id:3,t:"daily",name:"Contribuir à Seita",ico:"🏯",desc:"Doa pedras de espírito.",obj:5000,prog:3200,done:false,claimed:false},
+    {id:4,t:"weekly",name:"Ascender de Camada",ico:"✦",desc:"Sobe uma camada esta semana.",obj:1,prog:0,done:false,claimed:false},
+  ];
+  function QRow({q}){
+    return (
+      <div style={{display:"flex",flexDirection:"column",gap:5,padding:"9px 2px",borderBottom:"1px solid rgba(140,90,20,.15)"}}>
+        <div style={{display:"flex",alignItems:"center",gap:8}}>
+          <span style={{fontSize:17}}>{q.ico}</span>
+          <span style={{flex:1,fontSize:12.5,fontWeight:600}}>{q.name}</span>
+          {q.claimed?<Badge v="jade">✓</Badge>:q.done?<Badge v="warn">Pronta</Badge>:null}
+        </div>
+        <div style={{fontSize:11,color:"#7a5f3a"}}>{q.desc}</div>
+        <Bar pct={q.obj>0?Math.min(100,q.prog/q.obj*100):0} v="cult"/>
+        <div style={{fontSize:10.5,color:"#7a5f3a",textAlign:"right"}}>{fmtNum(q.prog)} / {fmtNum(q.obj)}</div>
+      </div>
+    );
+  }
+  const dailies=quests.filter(q=>q.t==="daily"), weeklies=quests.filter(q=>q.t==="weekly");
+  return (
+    <div>
+      <Card><CardTitle l="Diárias" r={`${dailies.filter(q=>q.done).length}/${dailies.length}`}/>{dailies.map(q=><QRow key={q.id} q={q}/>)}</Card>
+      <Card><CardTitle l="Semanais" r={`${weeklies.filter(q=>q.done).length}/${weeklies.length}`}/>{weeklies.map(q=><QRow key={q.id} q={q}/>)}</Card>
+    </div>
+  );
+}
+
+// ─── Announcements tab ────────────────────────────────────────────────────
+function AnnsTab(){
+  const items=[
+    {id:1,ico:"⚔️",text:"劍天明 ascendeu ao reino Imortal Verdadeiro!",when:"Há 2h"},
+    {id:2,ico:"🐉",text:"Novo Chefe Mundial: Dragão Celestial do Caos Primordial.",when:"Há 5h"},
+    {id:3,ico:"🏯",text:"Seita Picos Nevados conquista 1º lugar no ranking!",when:"Há 1d"},
+    {id:4,ico:"💊",text:"Nova pílula: Longevidade Suprema (Grau 6) disponível.",when:"Há 2d"},
+    {id:5,ico:"✨",text:"Evento de Duplo Qi activo até domingo às 23h59.",when:"Há 3d"},
+  ];
+  return (
+    <div>
+      <Card>
+        <CardTitle l="Anúncios Globais" r={items.length}/>
+        {items.map(a=>(
+          <div key={a.id} style={{display:"flex",gap:10,padding:"9px 2px",borderBottom:"1px solid rgba(140,90,20,.15)",animation:"fade-up .3s ease"}}>
+            <span style={{fontSize:18,flexShrink:0}}>{a.ico}</span>
+            <div style={{flex:1}}>
+              <div style={{fontSize:12,lineHeight:1.45}}>{a.text}</div>
+              <div style={{fontSize:10,color:"#7a5f3a",marginTop:3}}>{a.when}</div>
+            </div>
+          </div>
+        ))}
+      </Card>
+    </div>
+  );
+}
+
+// ─── Root App ─────────────────────────────────────────────────────────────
+const REALM_COLORS_RAW = ["#9ca3af","#60a5fa","#fbbf24","#a855f7","#2dd4bf","#3b82f6","#8b5cf6","#f59e0b","#38bdf8","#eab308","#f472b6"];
+
+function App(){
+  const [tab,setTab]=useState("cultivation");
+  const [realm,setRealm]=useState(4);
+  const player={...PLAYER,realm};
+  const screens={
+    cultivation:<CultivationTab player={player}/>,
+    sect:<SectTab/>,
+    world_boss:<BossTab/>,
+    leaderboard:<LeaderboardTab/>,
+    inventory:<InventoryTab/>,
+    quests:<QuestsTab/>,
+    announcements:<AnnsTab/>,
+  };
+
+  return (
+    <div className="stage">
+      {/* Sidebar */}
+      <div className="sidebar">
+        <div>
+          <div className="s-title">Nivrael<br/>UI Kit</div>
+          <div className="s-sub">Telegram Mini App<br/>Caminho da Imortalidade<br/>React · 7 tabs · PT/EN/ES</div>
+        </div>
+        <div className="s-divider"/>
+        <div>
+          <div className="s-label">Tabs</div>
+          <div className="s-tab-list">
+            {TAB_DEFS.map(td=>(
+              <div key={td.key} className={`s-tab${tab===td.key?" active":""}`} onClick={()=>setTab(td.key)}>
+                <span className="s-ico">{td.ico}</span>
+                <span className="s-lbl">{td.label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="s-divider"/>
+        <div>
+          <div className="s-label">Reino</div>
+          <div className="realm-picker">
+            {REALM_COLORS_RAW.map((c,i)=>(
+              <div key={i} className={`realm-pip${realm===i?" active":""}`}
+                onClick={()=>setRealm(i)}
+                style={{background:realm===i?c+"22":"rgba(0,0,0,.35)",borderColor:realm===i?c:"rgba(120,80,20,.3)",color:c,boxShadow:realm===i?`0 0 8px ${c}66`:"none"}}>
+                {REALM_GLYPHS[i]}
+              </div>
+            ))}
+          </div>
+          <div style={{fontSize:10,color:"#7a5f3a",marginTop:6,fontFamily:"'Cinzel',serif"}}>
+            Realm {realm} — {REALM_NAMES[realm]}
+          </div>
+        </div>
+        <div className="s-divider"/>
+        <div className="s-meta">
+          <b>Fonts:</b> Cinzel · Noto Serif SC<br/>
+          <b>Gold:</b> #c9903a · #f5c97a<br/>
+          <b>BG:</b> hero-bg.webp (dim)<br/>
+          <b>Cards:</b> warm parchment · gold borders<br/>
+          <b>Nav:</b> label acima · ícone abaixo
+        </div>
+      </div>
+
+      {/* Phone */}
+      <div className="phone">
+        <div className="phone-notch"/>
+        <div className="app">
+          <div className="app-bg"/>
+          <div className="app-bg-overlay"/>
+          <div className="bg-glyphs">
+            {[{g:"道",s:110,t:"8%",l:"4%",d:0,dur:16},{g:"仙",s:140,t:"30%",r:"3%",d:-6,dur:19},{g:"氣",s:90,b:"20%",l:"7%",d:-10,dur:13},{g:"劍",s:120,b:"8%",r:"10%",d:-3,dur:17}].map((x,i)=>(
+              <span key={i} style={{fontSize:x.s,top:x.t,bottom:x.b,left:x.l,right:x.r,animationDelay:x.d+"s",animationDuration:x.dur+"s"}}>{x.g}</span>
+            ))}
+          </div>
+          <Header player={player}/>
+          <div className="content">{screens[tab]}</div>
+          <TabBar tab={tab} setTab={setTab}/>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+CREATE INDEX IF NOT EXISTS idx_player_ores_player_id ON player_ores (player_id);
+CREATE INDEX IF NOT EXISTS idx_player_cauldrons_player_id ON player_cauldrons (player_id);
+CREATE INDEX IF NOT EXISTS idx_player_buffs_player_id ON player_buffs (player_id);
+CREATE INDEX IF NOT EXISTS idx_p2p_trades_initiator_id ON p2p_trades (initiator_id);
+CREATE INDEX IF NOT EXISTS idx_p2p_trades_target_id ON p2p_trades (target_id);
+CREATE INDEX IF NOT EXISTS idx_transactions_from_player ON transactions (from_player);
+CREATE INDEX IF NOT EXISTS idx_transactions_to_player ON transactions (to_player);
+CREATE INDEX IF NOT EXISTS idx_sects_master_id ON sects (master_id);
+CREATE INDEX IF NOT EXISTS idx_sect_buildings_log_sect_id ON sect_buildings_log (sect_id);
+CREATE INDEX IF NOT EXISTS idx_sect_war_log_attacker_sect ON sect_war_log (attacker_sect);
+CREATE INDEX IF NOT EXISTS idx_sect_war_log_defender_sect ON sect_war_log (defender_sect);
+CREATE INDEX IF NOT EXISTS idx_combat_log_attacker_id ON combat_log (attacker_id);
+CREATE INDEX IF NOT EXISTS idx_combat_log_defender_id ON combat_log (defender_id);
+CREATE INDEX IF NOT EXISTS idx_player_beasts_player_id ON player_beasts (player_id);
+CREATE INDEX IF NOT EXISTS idx_gacha_history_player_id ON gacha_history (player_id);
+CREATE INDEX IF NOT EXISTS idx_prestige_log_player_id ON prestige_log (player_id);

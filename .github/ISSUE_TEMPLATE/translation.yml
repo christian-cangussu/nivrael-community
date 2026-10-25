@@ -1,0 +1,44 @@
+name: Translation
+description: A wrong, missing or clumsy text in Portuguese, English or Spanish.
+labels: ["translation"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A fix of a few words is a perfect first pull request — `docs/translations.md`, in this repository, says where every string lives. An issue is fine too.
+  - type: dropdown
+    id: language
+    attributes:
+      label: Language
+      options:
+        - Português (Brasil)
+        - English
+        - Español
+    validations:
+      required: true
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Where you read it
+      options:
+        - the browser client or the Mini App
+        - the Telegram chat, or a message the game sent
+        - a public page (/login, /play, /privacy, /terms)
+        - I do not know
+  - type: textarea
+    id: now
+    attributes:
+      label: What it says now
+    validations:
+      required: true
+  - type: textarea
+    id: should
+    attributes:
+      label: What it should say
+    validations:
+      required: true
+  - type: input
+    id: key
+    attributes:
+      label: The key, if you found it
+      placeholder: e.g. tsh_sky_sereno

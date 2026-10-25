@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Noto+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#06080f;font-family:'Noto Sans',sans-serif;padding:20px 24px;color:#e2eaff}
+.grid{display:flex;flex-wrap:wrap;gap:10px}
+.swatch{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);min-width:220px;flex:1}
+.dot{width:36px;height:36px;border-radius:8px;flex-shrink:0;border:1px solid rgba(255,255,255,.1)}
+.label{font-family:'Cinzel',serif;font-size:11px;letter-spacing:.5px;color:#e2eaff;font-weight:600}
+.hex{font-size:10px;color:#6e89bf;margin-top:2px;font-family:monospace}
+.desc{font-size:10px;color:#3d5a9e;margin-top:1px}
+.section-title{font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#6e89bf;margin:18px 0 8px;width:100%}
+</style></head>
+<body>
+<div class="grid">
+  <div class="section-title">Backgrounds & Surfaces</div>
+  <div class="swatch"><div class="dot" style="background:#06080f;border-color:#1e3060"></div><div><div class="label">--bg</div><div class="hex">#06080f</div><div class="desc">App background</div></div></div>
+  <div class="swatch"><div class="dot" style="background:#0d1422"></div><div><div class="label">--card</div><div class="hex">#0d1422</div><div class="desc">Card surface</div></div></div>
+  <div class="swatch"><div class="dot" style="background:#111d35"></div><div><div class="label">--panel</div><div class="hex">#111d35</div><div class="desc">Elevated panel</div></div></div>
+  <div class="swatch"><div class="dot" style="background:#1e3060"></div><div><div class="label">--border</div><div class="hex">#1e3060</div><div class="desc">Default border</div></div></div>
+  <div class="swatch"><div class="dot" style="background:#253f7a"></div><div><div class="label">--border2</div><div class="hex">#253f7a</div><div class="desc">Highlighted border</div></div></div>
+
+  <div class="section-title">Text</div>
+  <div class="swatch"><div class="dot" style="background:#e2eaff"></div><div><div class="label">--text</div><div class="hex">#e2eaff</div><div class="desc">Primary text</div></div></div>
+  <div class="swatch"><div class="dot" style="background:#6e89bf"></div><div><div class="label">--muted</div><div class="hex">#6e89bf</div><div class="desc">Secondary / label</div></div></div>
+  <div class="swatch"><div class="dot" style="background:#3d5a9e"></div><div><div class="label">--muted2</div><div class="hex">#3d5a9e</div><div class="desc">Inactive / ghost</div></div></div>
+
+  <div class="section-title">Accents</div>
+  <div class="swatch"><div class="dot" style="background:#c9903a"></div><div><div class="label">--gold</div><div class="hex">#c9903a</div><div class="desc">Patinated gold</div></div></div>
+  <div class="swatch"><div class="dot" style="background:#f5c97a"></div><div><div class="label">--gold2</div><div class="hex">#f5c97a</div><div class="desc">Light gold — highlights</div></div></div>
+  <div class="swatch"><div class="dot" style="background:#3ecf7e"></div><div><div class="label">--jade</div><div class="hex">#3ecf7e</div><div class="desc">Jade green — success</div></div></div>
+  <div class="swatch"><div class="dot" style="background:#6b21a8"></div><div><div class="label">--purple</div><div class="hex">#6b21a8</div><div class="desc">Imperial purple</div></div></div>
+
+  <div class="section-title">Semantic</div>
+  <div class="swatch"><div class="dot" style="background:#e5534b"></div><div><div class="label">--red</div><div class="hex">#e5534b</div><div class="desc">Danger / HP</div></div></div>
+  <div class="swatch"><div class="dot" style="background:#f59e0b"></div><div><div class="label">--warn</div><div class="hex">#f59e0b</div><div class="desc">Warning / elder</div></div></div>
+</div>
+</body></html>
